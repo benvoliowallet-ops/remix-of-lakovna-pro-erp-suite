@@ -20,7 +20,9 @@ import Reports from "./pages/Reports";
 import Invoicing from "./pages/Invoicing";
 import PublicOrderStatus from "./pages/PublicOrderStatus";
 import Onboarding from "./pages/Onboarding";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
+import { CookieBanner } from "@/components/layout/CookieBanner";
 
 const queryClient = new QueryClient();
 
