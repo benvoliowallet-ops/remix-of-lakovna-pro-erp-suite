@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
+import { TrialBanner } from './TrialBanner';
 
 interface MainLayoutProps {
   children: React.ReactNode;
