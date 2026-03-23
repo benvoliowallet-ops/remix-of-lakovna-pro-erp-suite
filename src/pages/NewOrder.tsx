@@ -43,6 +43,19 @@ export default function NewOrder() {
 
   const [orderItems, setOrderItems] = useState<PendingOrderItem[]>([]);
 
+  // Block expired tenants from creating new orders
+  if (isExpired) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <p className="text-destructive font-medium">Trial vypršal — vytváranie zákaziek je pozastavené.</p>
+          <p className="text-muted-foreground text-sm">Pre aktiváciu kontaktujte adam.halasz@sanfog.com</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+
   const { data: companies } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
