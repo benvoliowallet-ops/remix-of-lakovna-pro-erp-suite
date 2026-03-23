@@ -72,6 +72,10 @@ const App = () => (
               <AdminRoute><Settings /></AdminRoute>
             } />
             
+            <Route path="/onboarding" element={
+              <ProtectedRoute><Onboarding /></ProtectedRoute>
+            } />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
