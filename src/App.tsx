@@ -19,6 +19,7 @@ import Settings from "./pages/Settings";
 import Reports from "./pages/Reports";
 import Invoicing from "./pages/Invoicing";
 import PublicOrderStatus from "./pages/PublicOrderStatus";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
