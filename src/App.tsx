@@ -75,6 +75,7 @@ const App = () => (
               <AdminRoute><Settings /></AdminRoute>
             } />
             
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/onboarding" element={
               <ProtectedRoute><Onboarding /></ProtectedRoute>
             } />
