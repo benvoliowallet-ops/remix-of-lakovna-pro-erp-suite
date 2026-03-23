@@ -240,11 +240,17 @@ export default function Auth() {
                 </div>
               </CardContent>
 
-              <CardFooter>
+              <CardFooter className="flex-col gap-3">
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Registrovať sa
                 </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Registráciou súhlasíte s{' '}
+                  <a href="/privacy-policy" className="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">
+                    ochranou osobných údajov
+                  </a>.
+                </p>
               </CardFooter>
             </form>
           </TabsContent>
