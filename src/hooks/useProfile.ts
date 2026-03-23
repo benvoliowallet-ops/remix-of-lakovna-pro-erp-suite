@@ -20,5 +20,5 @@ export function useProfile() {
     },
   });
 
-  return { profile, isLoading, hasTenant: !!profile?.tenant_id };
+  return { profile, isLoading: !!user && isLoading, hasTenant: !!profile?.tenant_id };
 }
