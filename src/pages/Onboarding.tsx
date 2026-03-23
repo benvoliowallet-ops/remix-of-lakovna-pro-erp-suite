@@ -79,7 +79,8 @@ export default function Onboarding() {
 
     setLoading(true);
     try {
-      const { error } = await supabase.rpc('create_tenant_for_user', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.rpc as any)('create_tenant_for_user', {
         p_name: form.name.trim(),
         p_ico: form.ico.trim() || null,
         p_dic: form.dic.trim() || null,
