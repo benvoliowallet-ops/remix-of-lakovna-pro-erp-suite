@@ -26,6 +26,7 @@ export default function NewOrder() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAdmin } = useAuth();
+  const { isExpired } = useTenantStatus();
   const [step, setStep] = useState<WizardStep>(1);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
