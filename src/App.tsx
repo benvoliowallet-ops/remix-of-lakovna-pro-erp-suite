@@ -20,7 +20,9 @@ import Reports from "./pages/Reports";
 import Invoicing from "./pages/Invoicing";
 import PublicOrderStatus from "./pages/PublicOrderStatus";
 import Onboarding from "./pages/Onboarding";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
+import { CookieBanner } from "@/components/layout/CookieBanner";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <CookieBanner />
       <BrowserRouter>
         <AuthProvider>
           <Routes>
@@ -72,6 +75,7 @@ const App = () => (
               <AdminRoute><Settings /></AdminRoute>
             } />
             
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/onboarding" element={
               <ProtectedRoute><Onboarding /></ProtectedRoute>
             } />
