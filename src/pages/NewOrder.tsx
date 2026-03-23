@@ -18,6 +18,7 @@ import type { Company, Customer, TransportType, PaymentMethod } from '@/lib/type
 import { CustomerFormDialog } from '@/components/customers/CustomerFormDialog';
 import { OrderSuccessDialog } from '@/components/orders/OrderSuccessDialog';
 import { OrderItemsEditor, PendingOrderItem } from '@/components/orders/OrderItemsEditor';
+import { useTenantStatus } from '@/hooks/useTenantStatus';
 
 type WizardStep = 1 | 2 | 3 | 4;
 
@@ -25,6 +26,7 @@ export default function NewOrder() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAdmin } = useAuth();
+  const { isExpired } = useTenantStatus();
   const [step, setStep] = useState<WizardStep>(1);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
@@ -40,6 +42,19 @@ export default function NewOrder() {
   });
 
   const [orderItems, setOrderItems] = useState<PendingOrderItem[]>([]);
+
+  // Block expired tenants from creating new orders
+  if (isExpired) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center h-64 gap-4">
+          <p className="text-destructive font-medium">Trial vypršal — vytváranie zákaziek je pozastavené.</p>
+          <p className="text-muted-foreground text-sm">Pre aktiváciu kontaktujte adam.halasz@sanfog.com</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
 
   const { data: companies } = useQuery({
     queryKey: ['companies'],
