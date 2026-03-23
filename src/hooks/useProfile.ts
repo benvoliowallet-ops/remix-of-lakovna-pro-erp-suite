@@ -11,7 +11,7 @@ export function useProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, pin_code')
+        .select('*')
         .eq('id', user!.id)
         .single();
       if (error) throw error;
@@ -20,5 +20,5 @@ export function useProfile() {
     },
   });
 
-  return { profile, isLoading, hasTenant: !!profile?.tenant_id };
+  return { profile, isLoading: !!user && isLoading, hasTenant: !!profile?.tenant_id };
 }
