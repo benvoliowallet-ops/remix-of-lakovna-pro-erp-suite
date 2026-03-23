@@ -18,6 +18,7 @@ import type { Company, Customer, TransportType, PaymentMethod } from '@/lib/type
 import { CustomerFormDialog } from '@/components/customers/CustomerFormDialog';
 import { OrderSuccessDialog } from '@/components/orders/OrderSuccessDialog';
 import { OrderItemsEditor, PendingOrderItem } from '@/components/orders/OrderItemsEditor';
+import { useTenantStatus } from '@/hooks/useTenantStatus';
 
 type WizardStep = 1 | 2 | 3 | 4;
 
