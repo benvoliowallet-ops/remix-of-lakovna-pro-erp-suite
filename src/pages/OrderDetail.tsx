@@ -1009,7 +1009,8 @@ export default function OrderDetail() {
             </div>
           </CardHeader>
           <CardContent>
-            {order.order_items && order.order_items.length > 0 ? (
+          {order.order_items && order.order_items.length > 0 ? (
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1227,6 +1228,7 @@ export default function OrderDetail() {
                   })}
                 </TableBody>
               </Table>
+              </div>
             ) : (
               <div className="py-8 text-center text-muted-foreground">
                 Žiadne položky. Kliknite na "Pridať položku" pre pridanie.

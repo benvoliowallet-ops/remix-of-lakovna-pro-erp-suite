@@ -78,6 +78,17 @@ export default function Inventory() {
         .eq('id', colorId);
 
       if (error) throw error;
+
+      await supabase
+        .from('inventory_adjustments')
+        .insert({
+          color_id: colorId,
+          actual_weight_kg: newStock,
+          expected_weight_kg: Number(color.stock_kg),
+          difference_kg: -0.3,
+          reason: 'Čistenie striekacej pištole',
+        });
+
       return { color, newStock };
     },
     onSuccess: ({ color, newStock }) => {

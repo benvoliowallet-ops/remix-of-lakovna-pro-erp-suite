@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +32,7 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
   const [minStockLimit, setMinStockLimit] = useState('');
   const [pricePerKg, setPricePerKg] = useState('');
   const [pricePerKgPurchase, setPricePerKgPurchase] = useState('');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   // Sync form with color data when dialog opens
   useEffect(() => {
@@ -32,6 +43,25 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
       setPricePerKgPurchase(String(color.price_per_kg_purchase || 0));
     }
   }, [color, open]);
+
+  const deleteColorMutation = useMutation({
+    mutationFn: async () => {
+      if (!color) throw new Error('Farba nenájdená');
+      const { error } = await supabase
+        .from('colors')
+        .delete()
+        .eq('id', color.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Farba bola vymazaná');
+      queryClient.invalidateQueries({ queryKey: ['colors'] });
+      onOpenChange(false);
+    },
+    onError: () => {
+      toast.error('Farbu sa nepodarilo vymazať');
+    },
+  });
 
   const updateColorMutation = useMutation({
     mutationFn: async () => {
@@ -66,6 +96,7 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
   if (!color) return null;
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
@@ -138,18 +169,50 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Zrušiť
-          </Button>
+        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
           <Button
-            onClick={() => updateColorMutation.mutate()}
-            disabled={updateColorMutation.isPending}
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={() => setDeleteConfirmOpen(true)}
           >
-            {updateColorMutation.isPending ? 'Ukladám...' : 'Uložiť zmeny'}
+            Vymazať farbu
           </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Zrušiť
+            </Button>
+            <Button
+              onClick={() => updateColorMutation.mutate()}
+              disabled={updateColorMutation.isPending}
+            >
+              {updateColorMutation.isPending ? 'Ukladám...' : 'Uložiť zmeny'}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Vymazať farbu RAL {color?.ral_code}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Táto akcia je nevratná. Farbu nebude možné obnoviť.
+            Ak je farba priradená k zákazkám, vymazanie môže spôsobiť problémy.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Zrušiť</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => deleteColorMutation.mutate()}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Áno, vymazať
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

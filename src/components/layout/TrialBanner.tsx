@@ -29,5 +29,11 @@ export function TrialBanner() {
     );
   }
 
-  return null;
+  return (
+    <div className="flex items-center gap-3 bg-blue-500/10 border-b border-blue-500/20 px-6 py-3 text-sm">
+      <span className="text-blue-800 dark:text-blue-300">
+        Ste na 14-dňovom trial. Zostáva vám <strong>{daysLeft} dní</strong>.
+      </span>
+    </div>
+  );
 }
