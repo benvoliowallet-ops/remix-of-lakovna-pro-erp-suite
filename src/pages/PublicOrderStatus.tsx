@@ -90,6 +90,9 @@ export default function PublicOrderStatus() {
     }
 
     fetchOrderStatus();
+
+    const interval = setInterval(fetchOrderStatus, 30000);
+    return () => clearInterval(interval);
   }, [id]);
 
   const getCurrentStepIndex = () => {
