@@ -114,6 +114,25 @@ export default function OrderDetail() {
     enabled: !!id,
   });
 
+  // Fetch all order IDs for prev/next navigation
+  const { data: orderIds } = useQuery({
+    queryKey: ['order-ids'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id')
+        .order('id', { ascending: false });
+      if (error) throw error;
+      return (data as { id: number }[]).map(o => o.id);
+    },
+  });
+
+  const currentIndex = orderIds?.indexOf(Number(id)) ?? -1;
+  const prevId = currentIndex > 0 ? orderIds?.[currentIndex - 1] : null;
+  const nextId = currentIndex >= 0 && currentIndex < (orderIds?.length ?? 0) - 1
+    ? orderIds?.[currentIndex + 1]
+    : null;
+
   // Group items by color for batch processing
   const colorGroups = useMemo(() => {
     if (!order?.order_items) return new Map<string, (OrderItem & { color: Color | null })[]>();
