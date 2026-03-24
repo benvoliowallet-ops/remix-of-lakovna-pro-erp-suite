@@ -294,7 +294,7 @@ export default function PublicOrderStatus() {
             Pre viac informácií nás kontaktujte telefonicky alebo emailom.
           </p>
           <p className="text-xs">
-            Táto stránka sa automaticky neaktualizuje. Pre aktuálny stav obnovte stránku.
+            Stav zákazky sa aktualizuje automaticky každých 30 sekúnd.
           </p>
           <button
             onClick={() => window.location.reload()}
