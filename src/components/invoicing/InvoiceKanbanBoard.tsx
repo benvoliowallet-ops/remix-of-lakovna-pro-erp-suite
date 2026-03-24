@@ -10,7 +10,6 @@ interface InvoiceKanbanBoardProps {
   orders: InvoiceOrder[];
   isLoading: boolean;
   onUpdate: () => void;
-  vatRate: number;
 }
 
 type ColumnType = 'waiting' | 'unpaid' | 'overdue' | 'paid';
@@ -54,7 +53,7 @@ const columns: Column[] = [
   },
 ];
 
-export function InvoiceKanbanBoard({ orders, isLoading, onUpdate, vatRate }: InvoiceKanbanBoardProps) {
+export function InvoiceKanbanBoard({ orders, isLoading, onUpdate }: InvoiceKanbanBoardProps) {
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);

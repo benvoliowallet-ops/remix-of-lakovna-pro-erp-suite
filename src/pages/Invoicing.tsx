@@ -139,7 +139,6 @@ export default function Invoicing() {
           orders={orders as InvoiceOrder[] || []} 
           isLoading={isLoading}
           onUpdate={refetch}
-          vatRate={vatRate}
         />
       </div>
     </MainLayout>
