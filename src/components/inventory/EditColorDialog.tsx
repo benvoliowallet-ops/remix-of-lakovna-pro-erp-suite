@@ -44,6 +44,25 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
     }
   }, [color, open]);
 
+  const deleteColorMutation = useMutation({
+    mutationFn: async () => {
+      if (!color) throw new Error('Farba nenájdená');
+      const { error } = await supabase
+        .from('colors')
+        .delete()
+        .eq('id', color.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Farba bola vymazaná');
+      queryClient.invalidateQueries({ queryKey: ['colors'] });
+      onOpenChange(false);
+    },
+    onError: () => {
+      toast.error('Farbu sa nepodarilo vymazať');
+    },
+  });
+
   const updateColorMutation = useMutation({
     mutationFn: async () => {
       if (!color) throw new Error('Farba nenájdená');
