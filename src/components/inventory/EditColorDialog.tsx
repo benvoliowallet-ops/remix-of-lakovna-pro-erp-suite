@@ -32,6 +32,7 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
   const [minStockLimit, setMinStockLimit] = useState('');
   const [pricePerKg, setPricePerKg] = useState('');
   const [pricePerKgPurchase, setPricePerKgPurchase] = useState('');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   // Sync form with color data when dialog opens
   useEffect(() => {
