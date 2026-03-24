@@ -168,18 +168,49 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Zrušiť
-          </Button>
+        <DialogFooter className="flex-row items-center justify-between sm:justify-between">
           <Button
-            onClick={() => updateColorMutation.mutate()}
-            disabled={updateColorMutation.isPending}
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={() => setDeleteConfirmOpen(true)}
           >
-            {updateColorMutation.isPending ? 'Ukladám...' : 'Uložiť zmeny'}
+            Vymazať farbu
           </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Zrušiť
+            </Button>
+            <Button
+              onClick={() => updateColorMutation.mutate()}
+              disabled={updateColorMutation.isPending}
+            >
+              {updateColorMutation.isPending ? 'Ukladám...' : 'Uložiť zmeny'}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Vymazať farbu RAL {color?.ral_code}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Táto akcia je nevratná. Farbu nebude možné obnoviť.
+            Ak je farba priradená k zákazkám, vymazanie môže spôsobiť problémy.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Zrušiť</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => deleteColorMutation.mutate()}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Áno, vymazať
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
