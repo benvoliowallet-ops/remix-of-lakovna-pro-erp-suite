@@ -25,7 +25,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Printer, Building2, User, Play, CheckCircle2, FileText, ChevronDown, Trash2, PackageCheck, AlertTriangle, Banknote, Lock, ExternalLink, Users, Pencil } from 'lucide-react';
+import { ArrowLeft, Plus, Printer, Building2, User, Play, CheckCircle2, FileText, ChevronDown, Trash2, PackageCheck, AlertTriangle, Banknote, Lock, ExternalLink, Users, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ORDER_STATUS_LABELS, ITEM_TYPE_LABELS, ORDER_ITEM_TYPE_LABELS, STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS, WORK_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '@/lib/types';
 import { formatRALWithName } from '@/lib/ral-colors';

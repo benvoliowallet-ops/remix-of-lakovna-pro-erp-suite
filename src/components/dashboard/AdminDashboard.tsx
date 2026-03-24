@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Euro, TrendingUp, AlertTriangle, ClipboardList, Calendar, ExternalLink } from 'lucide-react';
+import { Euro, TrendingUp, AlertTriangle, ClipboardList, Calendar, ExternalLink, Search } from 'lucide-react';
 import { ORDER_STATUS_LABELS, STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS } from '@/lib/types';
 import { formatRALWithName } from '@/lib/ral-colors';
 import { getDeadlineStatus, getWorkingDaysUntil } from '@/lib/working-days';
