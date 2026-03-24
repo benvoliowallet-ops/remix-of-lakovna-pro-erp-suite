@@ -156,8 +156,18 @@ export default function PublicOrderStatus() {
           </div>
           {order.companyName && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Building2 className="h-4 w-4" />
-              {order.companyName}
+              {order.logoUrl ? (
+                <img
+                  src={order.logoUrl}
+                  alt={order.companyName}
+                  className="h-10 w-auto object-contain"
+                />
+              ) : (
+                <>
+                  <Building2 className="h-4 w-4" />
+                  {order.companyName}
+                </>
+              )}
             </div>
           )}
         </div>

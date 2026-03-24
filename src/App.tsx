@@ -48,7 +48,7 @@ const App = () => (
               <ProtectedRoute><Orders /></ProtectedRoute>
             } />
             <Route path="/zakazky/nova" element={
-              <ProtectedRoute><NewOrder /></ProtectedRoute>
+              <AdminRoute><NewOrder /></AdminRoute>
             } />
             <Route path="/zakazky/:id" element={
               <ProtectedRoute><OrderDetail /></ProtectedRoute>

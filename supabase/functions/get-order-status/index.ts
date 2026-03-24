@@ -121,6 +121,7 @@ Deno.serve(async (req) => {
       deadlineAt: order.deadline_at,
       customerName: order.customer?.name || order.customer?.company_name || null,
       companyName: order.company?.name || null,
+      logoUrl: order.company?.logo_url || null,
       itemsTotal: totalItems,
       itemsCompleted: completedItems,
       itemsInProgress: inProgressItems,
