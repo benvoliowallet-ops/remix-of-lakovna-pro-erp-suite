@@ -129,7 +129,7 @@ export function InvoiceKanbanBoard({ orders, isLoading, onUpdate, vatRate }: Inv
                   order={order} 
                   columnType={column.id}
                   onUpdate={onUpdate}
-                  vatRate={vatRate}
+                  vatRate={order.company?.vat_rate || 20}
                 />
               ))
             )}

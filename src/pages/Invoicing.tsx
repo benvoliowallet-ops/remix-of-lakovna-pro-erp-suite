@@ -140,7 +140,6 @@ export default function Invoicing() {
           isLoading={isLoading}
           onUpdate={refetch}
           vatRate={vatRate}
-          getOrderVatRate={(order) => (order as InvoiceOrder).company?.vat_rate || 20}
         />
       </div>
     </MainLayout>
