@@ -213,5 +213,6 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+    </>
   );
 }
