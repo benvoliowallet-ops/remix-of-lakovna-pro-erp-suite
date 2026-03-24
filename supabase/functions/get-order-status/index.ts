@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
         created_at,
         deadline_at,
         customer:customers(name, company_name),
-        company:companies(name)
+        company:companies(name, logo_url)
       `)
       .eq("id", parseInt(orderId))
       .maybeSingle();
