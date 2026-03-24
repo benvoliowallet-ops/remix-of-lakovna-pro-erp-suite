@@ -16,6 +16,7 @@ import type { Color, Order } from '@/lib/types';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
+  const [dashSearch, setDashSearch] = useState('');
 
   const { data: orders } = useQuery({
     queryKey: ['orders-dashboard'],
