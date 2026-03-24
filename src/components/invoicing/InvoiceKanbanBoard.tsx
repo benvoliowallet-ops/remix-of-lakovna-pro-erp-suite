@@ -10,7 +10,6 @@ interface InvoiceKanbanBoardProps {
   orders: InvoiceOrder[];
   isLoading: boolean;
   onUpdate: () => void;
-  vatRate: number;
 }
 
 type ColumnType = 'waiting' | 'unpaid' | 'overdue' | 'paid';
