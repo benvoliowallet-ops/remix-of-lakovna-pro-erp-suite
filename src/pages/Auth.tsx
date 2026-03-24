@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,6 +30,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [resetMode, setResetMode] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({ email: '', password: '', confirmPassword: '', fullName: '' });
@@ -99,6 +102,29 @@ export default function Auth() {
     }
   };
 
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess('Email na reset hesla bol odoslaný. Skontrolujte schránku.');
+        setResetMode(false);
+      }
+    } catch {
+      setError('Nastala chyba pri odosielaní emailu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -120,141 +146,197 @@ export default function Auth() {
       </div>
 
       <Card className="w-full max-w-md">
-        <Tabs defaultValue="login" onValueChange={() => setError(null)}>
-          <CardHeader>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Prihlásenie</TabsTrigger>
-              <TabsTrigger value="signup">Registrácia</TabsTrigger>
-            </TabsList>
-          </CardHeader>
+        {resetMode ? (
+          <form onSubmit={handleReset}>
+            <CardHeader>
+              <CardTitle>Reset hesla</CardTitle>
+              <CardDescription>
+                Zadajte váš email a pošleme vám link na reset hesla.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              {success && (
+                <Alert className="border-success bg-success/10">
+                  <AlertDescription className="text-success">{success}</AlertDescription>
+                </Alert>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="vas@email.sk"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex-col gap-3">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Odoslať reset link
+              </Button>
+              <button
+                type="button"
+                onClick={() => { setResetMode(false); setError(null); setSuccess(null); }}
+                className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+              >
+                Späť na prihlásenie
+              </button>
+            </CardFooter>
+          </form>
+        ) : (
+          <Tabs defaultValue="login" onValueChange={() => setError(null)}>
+            <CardHeader>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Prihlásenie</TabsTrigger>
+                <TabsTrigger value="signup">Registrácia</TabsTrigger>
+              </TabsList>
+            </CardHeader>
 
-          <TabsContent value="login">
-            <form onSubmit={handleLogin}>
-              <CardContent className="space-y-4">
-                <CardDescription>
-                  Prihláste sa do systému Lakovňa PRO
-                </CardDescription>
+            <TabsContent value="login">
+              <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4">
+                  <CardDescription>
+                    Prihláste sa do systému Lakovňa PRO
+                  </CardDescription>
 
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="vas@email.sk"
-                    value={loginForm.email}
-                    onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                    required
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="login-email">Email</Label>
+                    <Input
+                      id="login-email"
+                      type="email"
+                      placeholder="vas@email.sk"
+                      value={loginForm.email}
+                      onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Heslo</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    required
-                  />
-                </div>
-              </CardContent>
+                  <div className="space-y-2">
+                    <Label htmlFor="login-password">Heslo</Label>
+                    <Input
+                      id="login-password"
+                      type="password"
+                      value={loginForm.password}
+                      onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                      required
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => { setResetMode(true); setError(null); }}
+                        className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+                      >
+                        Zabudnuté heslo?
+                      </button>
+                    </div>
+                  </div>
+                </CardContent>
 
-              <CardFooter>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Prihlásiť sa
-                </Button>
-              </CardFooter>
-            </form>
-          </TabsContent>
+                <CardFooter>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Prihlásiť sa
+                  </Button>
+                </CardFooter>
+              </form>
+            </TabsContent>
 
-          <TabsContent value="signup">
-            <form onSubmit={handleSignup}>
-              <CardContent className="space-y-4">
-                <CardDescription>
-                  Vytvorte si nový účet
-                </CardDescription>
+            <TabsContent value="signup">
+              <form onSubmit={handleSignup}>
+                <CardContent className="space-y-4">
+                  <CardDescription>
+                    Vytvorte si nový účet
+                  </CardDescription>
 
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
 
-                {success && (
-                  <Alert className="border-success bg-success/10">
-                    <AlertDescription className="text-success">{success}</AlertDescription>
-                  </Alert>
-                )}
+                  {success && (
+                    <Alert className="border-success bg-success/10">
+                      <AlertDescription className="text-success">{success}</AlertDescription>
+                    </Alert>
+                  )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Meno a priezvisko</Label>
-                  <Input
-                    id="signup-name"
-                    type="text"
-                    placeholder="Ján Novák"
-                    value={signupForm.fullName}
-                    onChange={(e) => setSignupForm({ ...signupForm, fullName: e.target.value })}
-                    required
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name">Meno a priezvisko</Label>
+                    <Input
+                      id="signup-name"
+                      type="text"
+                      placeholder="Ján Novák"
+                      value={signupForm.fullName}
+                      onChange={(e) => setSignupForm({ ...signupForm, fullName: e.target.value })}
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="vas@email.sk"
-                    value={signupForm.email}
-                    onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
-                    required
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="vas@email.sk"
+                      value={signupForm.email}
+                      onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Heslo</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={signupForm.password}
-                    onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
-                    required
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Heslo</Label>
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      value={signupForm.password}
+                      onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="signup-confirm">Potvrdiť heslo</Label>
-                  <Input
-                    id="signup-confirm"
-                    type="password"
-                    value={signupForm.confirmPassword}
-                    onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
-                    required
-                  />
-                </div>
-              </CardContent>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm">Potvrdiť heslo</Label>
+                    <Input
+                      id="signup-confirm"
+                      type="password"
+                      value={signupForm.confirmPassword}
+                      onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
+                      required
+                    />
+                  </div>
+                </CardContent>
 
-              <CardFooter className="flex-col gap-3">
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Registrovať sa
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  Registráciou súhlasíte s{' '}
-                  <a href="/privacy-policy" className="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">
-                    ochranou osobných údajov
-                  </a>.
-                </p>
-              </CardFooter>
-            </form>
-          </TabsContent>
-        </Tabs>
+                <CardFooter className="flex-col gap-3">
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Registrovať sa
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Registráciou súhlasíte s{' '}
+                    <a href="/privacy-policy" className="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">
+                      ochranou osobných údajov
+                    </a>.
+                  </p>
+                </CardFooter>
+              </form>
+            </TabsContent>
+          </Tabs>
+        )}
       </Card>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
