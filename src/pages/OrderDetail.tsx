@@ -25,7 +25,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Printer, Building2, User, Play, CheckCircle2, FileText, ChevronDown, Trash2, PackageCheck, AlertTriangle, Banknote, Lock, ExternalLink, Users, Pencil } from 'lucide-react';
+import { ArrowLeft, Plus, Printer, Building2, User, Play, CheckCircle2, FileText, ChevronDown, Trash2, PackageCheck, AlertTriangle, Banknote, Lock, ExternalLink, Users, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ORDER_STATUS_LABELS, ITEM_TYPE_LABELS, ORDER_ITEM_TYPE_LABELS, STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS, WORK_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '@/lib/types';
 import { formatRALWithName } from '@/lib/ral-colors';
@@ -113,6 +113,25 @@ export default function OrderDetail() {
     },
     enabled: !!id,
   });
+
+  // Fetch all order IDs for prev/next navigation
+  const { data: orderIds } = useQuery({
+    queryKey: ['order-ids'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id')
+        .order('id', { ascending: false });
+      if (error) throw error;
+      return (data as { id: number }[]).map(o => o.id);
+    },
+  });
+
+  const currentIndex = orderIds?.indexOf(Number(id)) ?? -1;
+  const prevId = currentIndex > 0 ? orderIds?.[currentIndex - 1] : null;
+  const nextId = currentIndex >= 0 && currentIndex < (orderIds?.length ?? 0) - 1
+    ? orderIds?.[currentIndex + 1]
+    : null;
 
   // Group items by color for batch processing
   const colorGroups = useMemo(() => {
@@ -700,6 +719,28 @@ export default function OrderDetail() {
               <p className="text-muted-foreground">
                 {new Date(order.created_at).toLocaleDateString('sk-SK')}
               </p>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => navigate(`/zakazky/${prevId}`)}
+                disabled={!prevId}
+                title="Predchádzajúca zákazka"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => navigate(`/zakazky/${nextId}`)}
+                disabled={!nextId}
+                title="Nasledujúca zákazka"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 

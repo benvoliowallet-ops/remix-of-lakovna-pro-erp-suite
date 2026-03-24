@@ -132,7 +132,7 @@ export default function Orders() {
   const handleViewChange = (value: string | undefined) => {
     if (value) {
       setViewMode(value as ViewMode);
-      // Reset filters when switching views
+      setSearch('');
       if (value === 'payment') {
         setStatusFilter('all');
         setShowOnlyActive(false);
