@@ -76,10 +76,10 @@ export function AdminDashboard() {
 
       const { data: colors } = await supabase
         .from('colors')
-        .select('stock_kg, price_per_kg');
+        .select('stock_kg, price_per_kg_purchase');
 
       const stockValue = (colors || []).reduce(
-        (sum, c) => sum + (Number(c.stock_kg) * Number(c.price_per_kg)),
+        (sum, c) => sum + (Number(c.stock_kg) * Number(c.price_per_kg_purchase || 0)),
         0
       );
 

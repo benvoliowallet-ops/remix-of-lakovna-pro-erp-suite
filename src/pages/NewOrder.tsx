@@ -49,7 +49,7 @@ export default function NewOrder() {
       <MainLayout>
         <div className="flex flex-col items-center justify-center h-64 gap-4">
           <p className="text-destructive font-medium">Trial vypršal — vytváranie zákaziek je pozastavené.</p>
-          <p className="text-muted-foreground text-sm">Pre aktiváciu kontaktujte adam.halasz@sanfog.com</p>
+          <p className="text-muted-foreground text-sm">Pre aktiváciu kontaktujte support@finishpro.sk</p>
         </div>
       </MainLayout>
     );
