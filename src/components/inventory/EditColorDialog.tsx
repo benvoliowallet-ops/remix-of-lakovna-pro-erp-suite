@@ -96,6 +96,7 @@ export function EditColorDialog({ open, onOpenChange, color }: EditColorDialogPr
   if (!color) return null;
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
