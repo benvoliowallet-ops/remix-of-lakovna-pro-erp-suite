@@ -30,6 +30,7 @@ interface PublicOrderData {
   deadlineAt: string | null;
   customerName: string | null;
   companyName: string | null;
+  logoUrl: string | null;
   itemsTotal: number;
   itemsCompleted: number;
   itemsInProgress: number;
