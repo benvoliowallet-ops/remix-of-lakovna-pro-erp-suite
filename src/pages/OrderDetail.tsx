@@ -1228,6 +1228,7 @@ export default function OrderDetail() {
                   })}
                 </TableBody>
               </Table>
+              </div>
             ) : (
               <div className="py-8 text-center text-muted-foreground">
                 Žiadne položky. Kliknite na "Pridať položku" pre pridanie.
