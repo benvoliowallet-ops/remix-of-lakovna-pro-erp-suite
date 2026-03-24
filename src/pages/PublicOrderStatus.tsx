@@ -30,6 +30,7 @@ interface PublicOrderData {
   deadlineAt: string | null;
   customerName: string | null;
   companyName: string | null;
+  logoUrl: string | null;
   itemsTotal: number;
   itemsCompleted: number;
   itemsInProgress: number;
@@ -90,6 +91,9 @@ export default function PublicOrderStatus() {
     }
 
     fetchOrderStatus();
+
+    const interval = setInterval(fetchOrderStatus, 30000);
+    return () => clearInterval(interval);
   }, [id]);
 
   const getCurrentStepIndex = () => {
@@ -152,8 +156,18 @@ export default function PublicOrderStatus() {
           </div>
           {order.companyName && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Building2 className="h-4 w-4" />
-              {order.companyName}
+              {order.logoUrl ? (
+                <img
+                  src={order.logoUrl}
+                  alt={order.companyName}
+                  className="h-10 w-auto object-contain"
+                />
+              ) : (
+                <>
+                  <Building2 className="h-4 w-4" />
+                  {order.companyName}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -291,7 +305,7 @@ export default function PublicOrderStatus() {
             Pre viac informácií nás kontaktujte telefonicky alebo emailom.
           </p>
           <p className="text-xs">
-            Táto stránka sa automaticky neaktualizuje. Pre aktuálny stav obnovte stránku.
+            Stav zákazky sa aktualizuje automaticky každých 30 sekúnd.
           </p>
           <button
             onClick={() => window.location.reload()}

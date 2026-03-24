@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
         created_at,
         deadline_at,
         customer:customers(name, company_name),
-        company:companies(name)
+        company:companies(name, logo_url)
       `)
       .eq("id", parseInt(orderId))
       .maybeSingle();
@@ -121,6 +121,7 @@ Deno.serve(async (req) => {
       deadlineAt: order.deadline_at,
       customerName: order.customer?.name || order.customer?.company_name || null,
       companyName: order.company?.name || null,
+      logoUrl: order.company?.logo_url || null,
       itemsTotal: totalItems,
       itemsCompleted: completedItems,
       itemsInProgress: inProgressItems,
