@@ -240,11 +240,30 @@ export function AdminDashboard() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent Orders */}
         <Card>
-          <CardHeader>
-            <CardTitle>Posledné zákazky</CardTitle>
-            <CardDescription>Najnovšie prijaté zákazky</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Posledné zákazky</CardTitle>
+              <CardDescription>Najnovšie prijaté zákazky</CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted-foreground"
+              onClick={() => navigate('/zakazky')}
+            >
+              Zobraziť všetky
+            </Button>
           </CardHeader>
           <CardContent>
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Rýchle hľadanie..."
+                value={dashSearch}
+                onChange={(e) => setDashSearch(e.target.value)}
+                className="pl-8 h-8 text-sm"
+              />
+            </div>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -254,7 +273,13 @@ export function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders?.map((order) => (
+                {orders
+                  ?.filter(order =>
+                    !dashSearch ||
+                    order.id.toString().includes(dashSearch) ||
+                    order.customer?.name?.toLowerCase().includes(dashSearch.toLowerCase())
+                  )
+                  .map((order) => (
                   <TableRow 
                     key={order.id}
                     className="cursor-pointer hover:bg-muted/50"
@@ -269,7 +294,11 @@ export function AdminDashboard() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {(!orders || orders.length === 0) && (
+                {(!orders || orders.filter(order =>
+                    !dashSearch ||
+                    order.id.toString().includes(dashSearch) ||
+                    order.customer?.name?.toLowerCase().includes(dashSearch.toLowerCase())
+                  ).length === 0) && (
                   <TableRow>
                     <TableCell colSpan={3} className="text-center text-muted-foreground">
                       Žiadne zákazky
