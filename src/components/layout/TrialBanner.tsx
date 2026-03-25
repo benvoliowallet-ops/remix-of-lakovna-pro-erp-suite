@@ -19,9 +19,16 @@ export function TrialBanner() {
 
   if (daysLeft <= 7) {
     return (
-      <div className="flex items-center gap-3 bg-yellow-500/10 border-b border-yellow-500/30 px-6 py-3 text-sm">
-        <AlertTriangle className="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
-        <span className="text-yellow-800 dark:text-yellow-300 font-medium">
+      <div
+        className="flex items-center gap-3 px-6 py-3 text-sm border-b"
+        style={{
+          background: 'rgba(242, 75, 89, 0.08)',
+          borderBottomColor: 'rgba(242, 75, 89, 0.3)',
+          color: '#F24B59',
+        }}
+      >
+        <AlertTriangle className="h-4 w-4 shrink-0" style={{ color: '#F24B59' }} />
+        <span className="font-medium">
           Trial končí o {daysLeft} {daysLeft === 1 ? 'deň' : daysLeft < 5 ? 'dni' : 'dní'}.
           Pre pokračovanie kontaktujte nás.
         </span>
@@ -30,8 +37,15 @@ export function TrialBanner() {
   }
 
   return (
-    <div className="flex items-center gap-3 bg-blue-500/10 border-b border-blue-500/20 px-6 py-3 text-sm">
-      <span className="text-blue-800 dark:text-blue-300">
+    <div
+      className="flex items-center gap-3 px-6 py-3 text-sm border-b"
+      style={{
+        background: 'rgba(242, 118, 46, 0.08)',
+        borderBottomColor: 'rgba(242, 118, 46, 0.3)',
+        color: '#F2762E',
+      }}
+    >
+      <span>
         Ste na 14-dňovom trial. Zostáva vám <strong>{daysLeft} dní</strong>.
       </span>
     </div>
