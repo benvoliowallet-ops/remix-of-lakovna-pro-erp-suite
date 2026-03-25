@@ -1,104 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@300;400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
-
-/* Lakovňa PRO - Industrial Design System */
+/* Lakovňa PRO — VORA Brand Design System */
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 25% 10%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 5%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 0 0% 5%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover-foreground: 0 0% 5%;
 
-    --primary: 220 70% 50%;
+    --primary: 25 89% 56%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 92%;
-    --secondary-foreground: 220 25% 20%;
+    --secondary: 25 100% 97%;
+    --secondary-foreground: 0 0% 5%;
 
-    --muted: 220 15% 95%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
 
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 25 100% 97%;
+    --accent-foreground: 25 89% 56%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 356 89% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 10%;
+    --warning: 25 89% 56%;
+    --warning-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 220 70% 50%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 25 89% 56%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 220 25% 12%;
-    --sidebar-foreground: 220 10% 90%;
-    --sidebar-primary: 25 95% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 220 10% 90%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 25 95% 53%;
+    --chart-1: 25 89% 56%;
+    --chart-2: 356 89% 60%;
+    --chart-3: 0 0% 5%;
+    --chart-4: 20 20% 60%;
+    --chart-5: 25 100% 97%;
 
-    /* Custom industrial colors */
-    --industrial-steel: 220 15% 30%;
-    --industrial-orange: 25 95% 53%;
-    --industrial-dark: 220 25% 12%;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 25 100% 97%;
+    --sidebar-primary: 25 89% 56%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 20 47% 9%;
+    --sidebar-accent-foreground: 25 89% 56%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 25 89% 56%;
+
+    /* VORA brand tokens */
+    --vora-orange: 25 89% 56%;
+    --vora-coral: 356 89% 60%;
+    --vora-dark: 0 0% 5%;
+    --vora-warm-light: 25 100% 97%;
     --production-green: 142 70% 45%;
     --production-yellow: 45 95% 55%;
-    --production-red: 0 84% 60%;
+    --production-red: 356 89% 60%;
   }
 
   .dark {
-    --background: 220 25% 8%;
-    --foreground: 220 10% 95%;
+    --background: 0 0% 5%;
+    --foreground: 25 100% 97%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 220 10% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 25 100% 97%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 220 10% 95%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 25 100% 97%;
 
-    --primary: 220 70% 55%;
+    --primary: 25 89% 56%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 20%;
-    --secondary-foreground: 220 10% 90%;
+    --secondary: 20 47% 9%;
+    --secondary-foreground: 25 100% 97%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 60%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 20 47% 9%;
+    --accent-foreground: 25 89% 56%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 356 89% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 220 70% 55%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 25 89% 56%;
 
-    --sidebar-background: 220 30% 6%;
-    --sidebar-foreground: 220 10% 90%;
-    --sidebar-primary: 25 95% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 25% 12%;
-    --sidebar-accent-foreground: 220 10% 90%;
-    --sidebar-border: 220 25% 15%;
-    --sidebar-ring: 25 95% 53%;
+    --sidebar-background: 0 0% 3%;
+    --sidebar-foreground: 25 100% 97%;
+    --sidebar-primary: 25 89% 56%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 20 47% 9%;
+    --sidebar-accent-foreground: 25 89% 56%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 25 89% 56%;
   }
 }
 
@@ -108,12 +115,19 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Open Sans', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    @apply tracking-tight;
+  }
+
+  button, .badge, label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
   }
 }
 
@@ -128,6 +142,7 @@
 
   .production-button {
     @apply h-16 text-lg font-semibold rounded-lg shadow-md transition-all active:scale-95;
+    font-family: 'Montserrat', sans-serif;
   }
 
   .stat-card {
@@ -136,6 +151,7 @@
 
   .status-badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    font-family: 'Montserrat', sans-serif;
   }
 
   .status-prijate {
