@@ -36,6 +36,15 @@ export default function Settings() {
   const [newPriceValue, setNewPriceValue] = useState('');
   const [newPriceUnit, setNewPriceUnit] = useState('m2');
 
+  // Production params state
+  const [prodParams, setProdParams] = useState<TenantProductionParams>({
+    disk_price_per_piece: 50,
+    zaklad_price_per_m2: 4,
+    gun_cleaning_kg: 0.3,
+    consumption_tolerance_pct: 15,
+  });
+  const [savingProd, setSavingProd] = useState(false);
+
   const { data: companies } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
