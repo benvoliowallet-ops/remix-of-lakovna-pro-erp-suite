@@ -303,11 +303,11 @@ export function CompanyEditDialog({ company, open, onOpenChange, onSuccess }: Co
               >
                 Zrušiť
               </Button>
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending && (
+              <Button type="submit" disabled={saveMutation.isPending}>
+                {saveMutation.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Uložiť
+                {isNew ? 'Vytvoriť' : 'Uložiť'}
               </Button>
             </DialogFooter>
           </form>
