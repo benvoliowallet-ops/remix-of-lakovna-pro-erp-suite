@@ -18,10 +18,12 @@ import type { Color } from '@/lib/types';
 import { findRALColor, formatRALWithName } from '@/lib/ral-colors';
 import { AddColorDialog } from '@/components/inventory/AddColorDialog';
 import { EditColorDialog } from '@/components/inventory/EditColorDialog';
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 export default function Inventory() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
+  const { settings } = useTenantSettings();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [structureFilter, setStructureFilter] = useState<string>('all');
@@ -71,7 +73,7 @@ export default function Inventory() {
       const color = colors?.find(c => c.id === colorId);
       if (!color) throw new Error('Farba nenájdená');
 
-      const newStock = Math.max(0, Number(color.stock_kg) - 0.3);
+      const newStock = Math.max(0, Number(color.stock_kg) - settings.gun_cleaning_kg);
       const { error } = await supabase
         .from('colors')
         .update({ stock_kg: newStock })
@@ -85,7 +87,7 @@ export default function Inventory() {
           color_id: colorId,
           actual_weight_kg: newStock,
           expected_weight_kg: Number(color.stock_kg),
-          difference_kg: -0.3,
+          difference_kg: -settings.gun_cleaning_kg,
           reason: 'Čistenie striekacej pištole',
         });
 
@@ -93,7 +95,7 @@ export default function Inventory() {
     },
     onSuccess: ({ color, newStock }) => {
       toast.success(`Čistenie pištole: RAL ${color.ral_code}`, {
-        description: `Odčítané 0.3 kg. Nový stav: ${newStock.toFixed(3)} kg`,
+        description: `Odčítané ${settings.gun_cleaning_kg} kg. Nový stav: ${newStock.toFixed(3)} kg`,
       });
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       setCleanGunDialog(false);
@@ -134,7 +136,7 @@ export default function Inventory() {
                 <DialogHeader>
                   <DialogTitle>Čistenie pištole</DialogTitle>
                   <DialogDescription>
-                    Vyberte farbu, z ktorej sa odčíta 0.3 kg pre čistenie striekacej pištole.
+                    Vyberte farbu, z ktorej sa odčíta {settings.gun_cleaning_kg} kg pre čistenie striekacej pištole.
                   </DialogDescription>
                 </DialogHeader>
                 <Select value={selectedColorForCleaning} onValueChange={setSelectedColorForCleaning}>
@@ -157,7 +159,7 @@ export default function Inventory() {
                     onClick={() => cleanGunMutation.mutate(selectedColorForCleaning)}
                     disabled={!selectedColorForCleaning || cleanGunMutation.isPending}
                   >
-                    Potvrdiť (-0.3 kg)
+                    Potvrdiť (-{settings.gun_cleaning_kg} kg)
                   </Button>
                 </DialogFooter>
               </DialogContent>

@@ -42,6 +42,7 @@ import { WorkflowProgress, getWorkflowConstraint } from '@/components/orders/Wor
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 // Helper: Group items by color key (ral_code + structure + gloss)
 function getColorKey(item: OrderItem & { color: Color | null }): string {
@@ -54,6 +55,7 @@ export default function OrderDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAdmin, user } = useAuth();
+  const { settings } = useTenantSettings();
   
   const [addItemDialog, setAddItemDialog] = useState(false);
   const [startWorkDialog, setStartWorkDialog] = useState(false);
@@ -1387,6 +1389,7 @@ export default function OrderDetail() {
               <ConsumptionComparison
                 estimatedKg={totalEstimatedConsumption}
                 realKg={totalRealConsumption}
+                tolerancePct={settings.consumption_tolerance_pct}
               />
             </CardContent>
           </Card>
