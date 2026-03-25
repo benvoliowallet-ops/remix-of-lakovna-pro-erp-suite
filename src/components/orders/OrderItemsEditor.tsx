@@ -53,6 +53,10 @@ interface OrderItemsEditorProps {
 }
 
 export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: OrderItemsEditorProps) {
+  const { settings } = useTenantSettings();
+  const DISK_PRICE_PER_PIECE = settings.disk_price_per_piece;
+  const ZAKLAD_PRICE_PER_M2 = settings.zaklad_price_per_m2;
+
   const [showForm, setShowForm] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
 

@@ -43,6 +43,10 @@ interface AddOrderItemDialogProps {
 
 export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, isAdmin }: AddOrderItemDialogProps) {
   const queryClient = useQueryClient();
+  const { settings } = useTenantSettings();
+  const DISK_PRICE_PER_PIECE = settings.disk_price_per_piece;
+  const ZAKLAD_PRICE_PER_M2 = settings.zaklad_price_per_m2;
+
   const [showCalculator, setShowCalculator] = useState(false);
 
   const [formData, setFormData] = useState({
