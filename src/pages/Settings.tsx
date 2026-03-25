@@ -8,11 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building2, Tag, Pencil, Check, X, Plus, Trash2, SlidersHorizontal } from 'lucide-react';
+import { Building2, Tag, Pencil, Check, X, Plus, Trash2, SlidersHorizontal, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Company, PriceListItem, TenantProductionParams } from '@/lib/types';
 import { CompanyEditDialog } from '@/components/settings/CompanyEditDialog';
 import { UserManagement } from '@/components/settings/UserManagement';
+import { useStructuresGlosses, type TenantOption } from '@/hooks/useStructuresGlosses';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,8 @@ import {
 
 export default function Settings() {
   const queryClient = useQueryClient();
+  const { structures, glosses } = useStructuresGlosses();
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
@@ -35,6 +38,14 @@ export default function Settings() {
   const [newPriceName, setNewPriceName] = useState('');
   const [newPriceValue, setNewPriceValue] = useState('');
   const [newPriceUnit, setNewPriceUnit] = useState('m2');
+
+  // Structures/glosses add state
+  const [addingStructure, setAddingStructure] = useState(false);
+  const [newStructureValue, setNewStructureValue] = useState('');
+  const [newStructureLabel, setNewStructureLabel] = useState('');
+  const [addingGloss, setAddingGloss] = useState(false);
+  const [newGlossValue, setNewGlossValue] = useState('');
+  const [newGlossLabel, setNewGlossLabel] = useState('');
 
   // Production params state
   const [prodParams, setProdParams] = useState<TenantProductionParams>({
@@ -193,6 +204,71 @@ export default function Settings() {
     }
     addPriceMutation.mutate({ name: newPriceName.trim(), price, unit: newPriceUnit || 'm2' });
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any;
+
+  const addStructureMutation = useMutation({
+    mutationFn: async ({ value, label }: { value: string; label: string }) => {
+      const { error } = await db.from('tenant_structures').insert({
+        value: value.toLowerCase().replace(/\s+/g, '_'),
+        label,
+        sort_order: structures.length + 1,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Štruktúra pridaná');
+      queryClient.invalidateQueries({ queryKey: ['tenant-structures'] });
+      setAddingStructure(false);
+      setNewStructureValue('');
+      setNewStructureLabel('');
+    },
+    onError: () => toast.error('Chyba pri pridávaní štruktúry'),
+  });
+
+  const deleteStructureMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from('tenant_structures').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Štruktúra odstránená');
+      queryClient.invalidateQueries({ queryKey: ['tenant-structures'] });
+    },
+    onError: () => toast.error('Chyba pri mazaní štruktúry'),
+  });
+
+  const addGlossMutation = useMutation({
+    mutationFn: async ({ value, label }: { value: string; label: string }) => {
+      const { error } = await db.from('tenant_glosses').insert({
+        value: value.toLowerCase().replace(/\s+/g, '_'),
+        label,
+        sort_order: glosses.length + 1,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Lesk pridaný');
+      queryClient.invalidateQueries({ queryKey: ['tenant-glosses'] });
+      setAddingGloss(false);
+      setNewGlossValue('');
+      setNewGlossLabel('');
+    },
+    onError: () => toast.error('Chyba pri pridávaní lesku'),
+  });
+
+  const deleteGlossMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from('tenant_glosses').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Lesk odstránený');
+      queryClient.invalidateQueries({ queryKey: ['tenant-glosses'] });
+    },
+    onError: () => toast.error('Chyba pri mazaní lesku'),
+  });
 
   return (
     <MainLayout>
@@ -499,7 +575,174 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Company Edit Dialog — edit existing */}
+        {/* Structures & Glosses */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Structures */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Layers className="h-5 w-5" />
+                  Štruktúry povrchu
+                </CardTitle>
+                <CardDescription>Dostupné štruktúry pri pridávaní farieb</CardDescription>
+              </div>
+              <Button size="sm" onClick={() => setAddingStructure(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Pridať
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Hodnota</TableHead>
+                    <TableHead>Názov</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {structures.map((s: TenantOption) => (
+                    <TableRow key={s.id}>
+                      <TableCell className="font-mono text-sm text-muted-foreground">{s.value}</TableCell>
+                      <TableCell className="font-medium">{s.label}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm" variant="ghost"
+                          onClick={() => deleteStructureMutation.mutate(s.id)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {addingStructure && (
+                    <TableRow>
+                      <TableCell>
+                        <Input
+                          value={newStructureValue}
+                          onChange={(e) => setNewStructureValue(e.target.value)}
+                          placeholder="napr. perla"
+                          className="h-8 font-mono"
+                          autoFocus
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={newStructureLabel}
+                          onChange={(e) => setNewStructureLabel(e.target.value)}
+                          placeholder="napr. Perla"
+                          className="h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newStructureValue && newStructureLabel)
+                              addStructureMutation.mutate({ value: newStructureValue, label: newStructureLabel });
+                            if (e.key === 'Escape') setAddingStructure(false);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost"
+                            onClick={() => newStructureValue && newStructureLabel && addStructureMutation.mutate({ value: newStructureValue, label: newStructureLabel })}
+                            className="h-8 w-8 p-0 text-success hover:text-success hover:bg-success/10"
+                          ><Check className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost"
+                            onClick={() => setAddingStructure(false)}
+                            className="h-8 w-8 p-0 text-muted-foreground"
+                          ><X className="h-4 w-4" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Glosses */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Layers className="h-5 w-5" />
+                  Stupne lesku
+                </CardTitle>
+                <CardDescription>Dostupné lesky pri pridávaní farieb</CardDescription>
+              </div>
+              <Button size="sm" onClick={() => setAddingGloss(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Pridať
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Hodnota</TableHead>
+                    <TableHead>Názov</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {glosses.map((g: TenantOption) => (
+                    <TableRow key={g.id}>
+                      <TableCell className="font-mono text-sm text-muted-foreground">{g.value}</TableCell>
+                      <TableCell className="font-medium">{g.label}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm" variant="ghost"
+                          onClick={() => deleteGlossMutation.mutate(g.id)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {addingGloss && (
+                    <TableRow>
+                      <TableCell>
+                        <Input
+                          value={newGlossValue}
+                          onChange={(e) => setNewGlossValue(e.target.value)}
+                          placeholder="napr. ultra_matne"
+                          className="h-8 font-mono"
+                          autoFocus
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={newGlossLabel}
+                          onChange={(e) => setNewGlossLabel(e.target.value)}
+                          placeholder="napr. Ultra matné"
+                          className="h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newGlossValue && newGlossLabel)
+                              addGlossMutation.mutate({ value: newGlossValue, label: newGlossLabel });
+                            if (e.key === 'Escape') setAddingGloss(false);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost"
+                            onClick={() => newGlossValue && newGlossLabel && addGlossMutation.mutate({ value: newGlossValue, label: newGlossLabel })}
+                            className="h-8 w-8 p-0 text-success hover:text-success hover:bg-success/10"
+                          ><Check className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost"
+                            onClick={() => setAddingGloss(false)}
+                            className="h-8 w-8 p-0 text-muted-foreground"
+                          ><X className="h-4 w-4" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
         <CompanyEditDialog
           company={editingCompany}
           open={!!editingCompany}

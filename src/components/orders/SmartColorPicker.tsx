@@ -29,15 +29,16 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { RAL_COLORS, findRALColor, formatRALWithName, type RALColor } from '@/lib/ral-colors';
 import { STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS } from '@/lib/types';
-import type { StructureType, GlossType, Color } from '@/lib/types';
+import type { Color } from '@/lib/types';
+import { useStructuresGlosses } from '@/hooks/useStructuresGlosses';
 
 interface SmartColorPickerProps {
   value?: string; // color_id
   onChange: (colorId: string) => void;
 }
 
-const STRUCTURE_OPTIONS: StructureType[] = ['hladka', 'jemna', 'hruba', 'antik', 'kladivkova'];
-const GLOSS_OPTIONS: GlossType[] = ['leskle', 'polomatne', 'matne', 'hlboko_matne', 'metalicke', 'fluorescentne', 'glitrove', 'perletove', 'satenovane'];
+const STRUCTURE_OPTIONS: string[] = ['hladka', 'jemna', 'hruba', 'antik', 'kladivkova'];
+const GLOSS_OPTIONS: string[] = ['leskle', 'polomatne', 'matne', 'hlboko_matne', 'metalicke', 'fluorescentne', 'glitrove', 'perletove', 'satenovane'];
 
 // RAL color family groups
 const RAL_FAMILIES: { name: string; range: [number, number]; color: string }[] = [
@@ -76,14 +77,15 @@ function saveRecentColor(colorId: string) {
 
 export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
   const queryClient = useQueryClient();
-  const [structure, setStructure] = useState<StructureType | ''>('');
-  const [gloss, setGloss] = useState<GlossType | ''>('');
+  const { structures, glosses, getLabelForStructure, getLabelForGloss } = useStructuresGlosses();
+  const [structure, setStructure] = useState<string>('');
+  const [gloss, setGloss] = useState<string>('');
   const [ralCode, setRalCode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [pendingColor, setPendingColor] = useState<{ structure: StructureType; gloss: GlossType; ralCode: string; hexCode: string } | null>(null);
+  const [pendingColor, setPendingColor] = useState<{ structure: string; gloss: string; ralCode: string; hexCode: string } | null>(null);
   const [recentColorIds, setRecentColorIds] = useState<string[]>([]);
 
   // Load recent colors on mount
@@ -132,7 +134,7 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
   });
 
   // Find matching color in database
-  const findMatchingColor = (s: StructureType, g: GlossType, ral: string): Color | undefined => {
+  const findMatchingColor = (s: string, g: string, ral: string): Color | undefined => {
     return existingColors?.find(
       c => c.structure === s && c.gloss === g && c.ral_code === ral
     );
@@ -140,9 +142,8 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
 
   // Create new color mutation
   const createColorMutation = useMutation({
-    mutationFn: async (newColor: { ral_code: string; structure: StructureType; gloss: GlossType; hex_code: string }) => {
-      const { data, error } = await supabase
-        .from('colors')
+    mutationFn: async (newColor: { ral_code: string; structure: string; gloss: string; hex_code: string }) => {
+      const { data, error } = await (supabase.from('colors') as any)
         .insert({
           ral_code: newColor.ral_code,
           structure: newColor.structure,
@@ -173,7 +174,7 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
   });
 
   // Handle selection change
-  const handleSelectionChange = (newStructure: StructureType | '', newGloss: GlossType | '', newRalCode: string) => {
+  const handleSelectionChange = (newStructure: string, newGloss: string, newRalCode: string) => {
     setStructure(newStructure);
     setGloss(newGloss);
     setRalCode(newRalCode);
@@ -343,15 +344,15 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
               <Label className="text-sm font-medium">Štruktúra povrchu</Label>
               <Select
                 value={structure}
-                onValueChange={(v) => handleSelectionChange(v as StructureType, gloss, ralCode)}
+                onValueChange={(v) => handleSelectionChange(v, gloss, ralCode)}
               >
                 <SelectTrigger className="min-h-[56px] text-base">
                   <SelectValue placeholder="Vyberte štruktúru" />
                 </SelectTrigger>
                 <SelectContent>
-                  {STRUCTURE_OPTIONS.map((s) => (
-                    <SelectItem key={s} value={s} className="min-h-[48px]">
-                      {STRUCTURE_TYPE_LABELS[s]}
+                  {(structures.length > 0 ? structures : STRUCTURE_OPTIONS.map(v => ({ value: v, label: v }))).map((s) => (
+                    <SelectItem key={s.value} value={s.value} className="min-h-[48px]">
+                      {s.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -362,15 +363,15 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
               <Label className="text-sm font-medium">Stupeň lesku</Label>
               <Select
                 value={gloss}
-                onValueChange={(v) => handleSelectionChange(structure, v as GlossType, ralCode)}
+                onValueChange={(v) => handleSelectionChange(structure, v, ralCode)}
               >
                 <SelectTrigger className="min-h-[56px] text-base">
                   <SelectValue placeholder="Vyberte lesk" />
                 </SelectTrigger>
                 <SelectContent>
-                  {GLOSS_OPTIONS.map((g) => (
-                    <SelectItem key={g} value={g} className="min-h-[48px]">
-                      {GLOSS_TYPE_LABELS[g]}
+                  {(glosses.length > 0 ? glosses : GLOSS_OPTIONS.map(v => ({ value: v, label: v }))).map((g) => (
+                    <SelectItem key={g.value} value={g.value} className="min-h-[48px]">
+                      {g.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
