@@ -4,16 +4,16 @@ interface ConsumptionComparisonProps {
   estimatedKg: number;
   realKg: number;
   className?: string;
+  tolerancePct?: number;
 }
 
-export function ConsumptionComparison({ estimatedKg, realKg, className = '' }: ConsumptionComparisonProps) {
+export function ConsumptionComparison({ estimatedKg, realKg, className = '', tolerancePct }: ConsumptionComparisonProps) {
   const difference = realKg - estimatedKg;
   const percentDiff = estimatedKg > 0 ? (difference / estimatedKg) * 100 : 0;
-  
-  // Tolerance: ±15% is acceptable
-  const isOverConsumption = percentDiff > 15;
-  const isUnderConsumption = percentDiff < -15;
-  const isNormal = !isOverConsumption && !isUnderConsumption;
+
+  const tolerance = tolerancePct ?? 15;
+  const isOverConsumption = percentDiff > tolerance;
+  const isUnderConsumption = percentDiff < -tolerance;
 
   const getStatusColor = () => {
     if (isOverConsumption) return 'text-destructive';

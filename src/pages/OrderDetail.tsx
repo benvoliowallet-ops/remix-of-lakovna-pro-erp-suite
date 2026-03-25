@@ -42,6 +42,7 @@ import { WorkflowProgress, getWorkflowConstraint } from '@/components/orders/Wor
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 // Helper: Group items by color key (ral_code + structure + gloss)
 function getColorKey(item: OrderItem & { color: Color | null }): string {

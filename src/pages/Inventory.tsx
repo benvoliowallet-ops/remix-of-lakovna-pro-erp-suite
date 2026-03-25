@@ -18,10 +18,12 @@ import type { Color } from '@/lib/types';
 import { findRALColor, formatRALWithName } from '@/lib/ral-colors';
 import { AddColorDialog } from '@/components/inventory/AddColorDialog';
 import { EditColorDialog } from '@/components/inventory/EditColorDialog';
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 export default function Inventory() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
+  const { settings } = useTenantSettings();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [structureFilter, setStructureFilter] = useState<string>('all');
