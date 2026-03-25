@@ -73,7 +73,7 @@ export default function Inventory() {
       const color = colors?.find(c => c.id === colorId);
       if (!color) throw new Error('Farba nenájdená');
 
-      const newStock = Math.max(0, Number(color.stock_kg) - 0.3);
+      const newStock = Math.max(0, Number(color.stock_kg) - settings.gun_cleaning_kg);
       const { error } = await supabase
         .from('colors')
         .update({ stock_kg: newStock })
@@ -87,7 +87,7 @@ export default function Inventory() {
           color_id: colorId,
           actual_weight_kg: newStock,
           expected_weight_kg: Number(color.stock_kg),
-          difference_kg: -0.3,
+          difference_kg: -settings.gun_cleaning_kg,
           reason: 'Čistenie striekacej pištole',
         });
 
@@ -95,7 +95,7 @@ export default function Inventory() {
     },
     onSuccess: ({ color, newStock }) => {
       toast.success(`Čistenie pištole: RAL ${color.ral_code}`, {
-        description: `Odčítané 0.3 kg. Nový stav: ${newStock.toFixed(3)} kg`,
+        description: `Odčítané ${settings.gun_cleaning_kg} kg. Nový stav: ${newStock.toFixed(3)} kg`,
       });
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       setCleanGunDialog(false);

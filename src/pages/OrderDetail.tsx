@@ -1389,6 +1389,7 @@ export default function OrderDetail() {
               <ConsumptionComparison
                 estimatedKg={totalEstimatedConsumption}
                 realKg={totalRealConsumption}
+                tolerancePct={settings.consumption_tolerance_pct}
               />
             </CardContent>
           </Card>
