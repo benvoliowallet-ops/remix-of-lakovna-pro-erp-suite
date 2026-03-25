@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Building2, Tag, Pencil, Check, X } from 'lucide-react';
+import { Building2, Tag, Pencil, Check, X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { ITEM_TYPE_LABELS } from '@/lib/types';
 import type { Company, PriceListItem } from '@/lib/types';
@@ -19,6 +19,7 @@ export default function Settings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [addingCompany, setAddingCompany] = useState(false);
 
   const { data: companies } = useQuery({
     queryKey: ['companies'],
