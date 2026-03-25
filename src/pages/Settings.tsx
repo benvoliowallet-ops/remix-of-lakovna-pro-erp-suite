@@ -87,14 +87,20 @@ export default function Settings() {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Companies */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Moje firmy
-              </CardTitle>
-              <CardDescription>
-                Firmy pre fakturáciu zákaziek
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  Moje firmy
+                </CardTitle>
+                <CardDescription>
+                  Firmy pre fakturáciu zákaziek
+                </CardDescription>
+              </div>
+              <Button size="sm" onClick={() => setAddingCompany(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Pridať firmu
+              </Button>
             </CardHeader>
             <CardContent>
               <Table>
