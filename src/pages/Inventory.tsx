@@ -136,7 +136,7 @@ export default function Inventory() {
                 <DialogHeader>
                   <DialogTitle>Čistenie pištole</DialogTitle>
                   <DialogDescription>
-                    Vyberte farbu, z ktorej sa odčíta 0.3 kg pre čistenie striekacej pištole.
+                    Vyberte farbu, z ktorej sa odčíta {settings.gun_cleaning_kg} kg pre čistenie striekacej pištole.
                   </DialogDescription>
                 </DialogHeader>
                 <Select value={selectedColorForCleaning} onValueChange={setSelectedColorForCleaning}>
@@ -159,7 +159,7 @@ export default function Inventory() {
                     onClick={() => cleanGunMutation.mutate(selectedColorForCleaning)}
                     disabled={!selectedColorForCleaning || cleanGunMutation.isPending}
                   >
-                    Potvrdiť (-0.3 kg)
+                    Potvrdiť (-{settings.gun_cleaning_kg} kg)
                   </Button>
                 </DialogFooter>
               </DialogContent>
