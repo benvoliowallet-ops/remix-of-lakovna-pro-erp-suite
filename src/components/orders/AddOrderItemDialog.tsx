@@ -26,14 +26,12 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
-import { ITEM_TYPE_LABELS, ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
+import { ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
 import type { PriceListItem, OrderItemType } from '@/lib/types';
 import { SmartColorPicker } from './SmartColorPicker';
 import { Badge } from '@/components/ui/badge';
 import { Calculator, ChevronDown, AlertTriangle, Tag, AlertCircle } from 'lucide-react';
-
-// Fixed price for wheel disks
-const DISK_PRICE_PER_PIECE = 50;
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 interface AddOrderItemDialogProps {
   orderId: number;
@@ -45,6 +43,10 @@ interface AddOrderItemDialogProps {
 
 export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, isAdmin }: AddOrderItemDialogProps) {
   const queryClient = useQueryClient();
+  const { settings } = useTenantSettings();
+  const DISK_PRICE_PER_PIECE = settings.disk_price_per_piece;
+  const ZAKLAD_PRICE_PER_M2 = settings.zaklad_price_per_m2;
+
   const [showCalculator, setShowCalculator] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -117,8 +119,6 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
     return area;
   }, [calcData, formData.item_type]);
 
-  // Fixed price for základ: €4/m²
-  const ZAKLAD_PRICE_PER_M2 = 4;
 
   const calculatePrice = (area: number, isRework: boolean, itemType?: string) => {
     if (isRework) return 0;
@@ -502,7 +502,7 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
                 <SelectContent>
                   {priceList?.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
-                      {ITEM_TYPE_LABELS[item.item_type]} - {Number(item.price_per_m2).toFixed(2)} €/m²
+                      {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} € / {item.unit ?? 'm²'}
                     </SelectItem>
                   ))}
                 </SelectContent>

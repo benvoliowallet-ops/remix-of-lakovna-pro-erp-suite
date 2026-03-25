@@ -19,13 +19,12 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { Plus, Trash2, Calculator, ChevronDown, Package, AlertTriangle, AlertCircle } from 'lucide-react';
-import { ORDER_ITEM_TYPE_LABELS, ITEM_TYPE_LABELS } from '@/lib/types';
+import { ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
 import type { PriceListItem, OrderItemType } from '@/lib/types';
 import { SmartColorPicker } from './SmartColorPicker';
 import { cn } from '@/lib/utils';
 import { parseLocalizedNumber } from '@/lib/parse-number';
-// Fixed price for wheel disks
-const DISK_PRICE_PER_PIECE = 50;
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 export interface PendingOrderItem {
   id: string;
@@ -54,6 +53,10 @@ interface OrderItemsEditorProps {
 }
 
 export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: OrderItemsEditorProps) {
+  const { settings } = useTenantSettings();
+  const DISK_PRICE_PER_PIECE = settings.disk_price_per_piece;
+  const ZAKLAD_PRICE_PER_M2 = settings.zaklad_price_per_m2;
+
   const [showForm, setShowForm] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
 
@@ -132,8 +135,6 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
     return area;
   }, [calcData, formData.item_type]);
 
-  // Fixed price for základ: €4/m²
-  const ZAKLAD_PRICE_PER_M2 = 4;
 
   const calculatePrice = (area: number, isRework: boolean, itemType?: OrderItemType) => {
     if (isRework) return 0;
@@ -500,7 +501,7 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
                           isBaseCoat && "text-destructive"
                         )}>
                           {index + 1}. {ORDER_ITEM_TYPE_LABELS[item.item_type]}
-                          {priceItem && ` (${ITEM_TYPE_LABELS[priceItem.item_type]})`}
+                          {priceItem && ` (${priceItem.name ?? priceItem.item_type})`}
                         </span>
                         {isBaseCoat && (
                           <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded font-bold">
@@ -612,7 +613,7 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
                   <SelectContent>
                     {priceList?.map((item) => (
                       <SelectItem key={item.id} value={item.id}>
-                        {ITEM_TYPE_LABELS[item.item_type]} - {Number(item.price_per_m2).toFixed(2)} €/m²
+                        {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} € / {item.unit ?? 'm²'}
                       </SelectItem>
                     ))}
                   </SelectContent>
