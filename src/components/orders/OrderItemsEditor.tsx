@@ -60,6 +60,7 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
 
   const [showForm, setShowForm] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
+  const [unifiedType, setUnifiedType] = useState<string>('');
 
   // Form state
   const [formData, setFormData] = useState({
