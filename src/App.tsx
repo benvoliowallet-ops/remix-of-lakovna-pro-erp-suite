@@ -16,6 +16,7 @@ import OrderProtocolHandover from "./pages/OrderProtocolHandover";
 import Inventory from "./pages/Inventory";
 import Customers from "./pages/Customers";
 import Settings from "./pages/Settings";
+import Konfiguracia from "./pages/Konfiguracia";
 import Reports from "./pages/Reports";
 import Invoicing from "./pages/Invoicing";
 import PublicOrderStatus from "./pages/PublicOrderStatus";
@@ -73,6 +74,9 @@ const App = () => (
             } />
             <Route path="/nastavenia" element={
               <AdminRoute><Settings /></AdminRoute>
+            } />
+            <Route path="/konfiguracia" element={
+              <AdminRoute><Konfiguracia /></AdminRoute>
             } />
             
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />

@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { LayoutDashboard, ClipboardList, Package, Users, Settings, LogOut, Factory, BarChart3, Receipt } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Package, Users, Settings, LogOut, Factory, BarChart3, Receipt, Sliders } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -32,6 +32,7 @@ const adminMenuItems = [
   { title: 'Reporty', url: '/reporty', icon: BarChart3 },
   { title: 'Fakturácia', url: '/fakturacia', icon: Receipt },
   { title: 'Nastavenia', url: '/nastavenia', icon: Settings },
+  { title: 'Konfigurácia', url: '/konfiguracia', icon: Sliders },
 ];
 
 export function AppSidebar() {
