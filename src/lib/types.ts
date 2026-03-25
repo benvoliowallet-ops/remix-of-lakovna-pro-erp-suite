@@ -181,7 +181,7 @@ export const ORDER_ITEM_TYPE_LABELS: Record<OrderItemType, string> = {
   doplnkova_sluzba: 'Doplnková služba',
 };
 
-export const STRUCTURE_TYPE_LABELS: Record<StructureType, string> = {
+export const STRUCTURE_TYPE_LABELS: Record<string, string> = {
   hladka: 'Hladká',
   jemna: 'Jemná',
   hruba: 'Hrubá',
@@ -189,7 +189,7 @@ export const STRUCTURE_TYPE_LABELS: Record<StructureType, string> = {
   kladivkova: 'Kladivková',
 };
 
-export const GLOSS_TYPE_LABELS: Record<GlossType, string> = {
+export const GLOSS_TYPE_LABELS: Record<string, string> = {
   leskle: 'Lesklé',
   matne: 'Matné',
   polomatne: 'Pololesklé',
