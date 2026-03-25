@@ -26,14 +26,12 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
-import { ITEM_TYPE_LABELS, ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
+import { ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
 import type { PriceListItem, OrderItemType } from '@/lib/types';
 import { SmartColorPicker } from './SmartColorPicker';
 import { Badge } from '@/components/ui/badge';
 import { Calculator, ChevronDown, AlertTriangle, Tag, AlertCircle } from 'lucide-react';
-
-// Fixed price for wheel disks
-const DISK_PRICE_PER_PIECE = 50;
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 interface AddOrderItemDialogProps {
   orderId: number;

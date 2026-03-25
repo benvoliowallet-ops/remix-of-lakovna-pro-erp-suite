@@ -19,13 +19,12 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { Plus, Trash2, Calculator, ChevronDown, Package, AlertTriangle, AlertCircle } from 'lucide-react';
-import { ORDER_ITEM_TYPE_LABELS, ITEM_TYPE_LABELS } from '@/lib/types';
+import { ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
 import type { PriceListItem, OrderItemType } from '@/lib/types';
 import { SmartColorPicker } from './SmartColorPicker';
 import { cn } from '@/lib/utils';
 import { parseLocalizedNumber } from '@/lib/parse-number';
-// Fixed price for wheel disks
-const DISK_PRICE_PER_PIECE = 50;
+import { useTenantSettings } from '@/hooks/useTenantSettings';
 
 export interface PendingOrderItem {
   id: string;
