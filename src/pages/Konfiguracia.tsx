@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -13,8 +13,9 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Pencil, Trash2, Plus, Check, X, Tag } from 'lucide-react';
+import { Pencil, Trash2, Plus, Check, X, Tag, Settings2, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTenantSettings, TenantSettings } from '@/hooks/useTenantSettings';
 
 const UNIT_OPTIONS = [
   { value: 'm2', label: 'm²' },
@@ -23,11 +24,21 @@ const UNIT_OPTIONS = [
 ];
 
 export default function Konfiguracia() {
+  // ── Cenník state ──
   const [addForm, setAddForm] = useState({ name: '', unit: 'm2', price: '' });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState({ price: '', unit: '' });
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
+  // ── Parametre výroby state ──
+  const { settings, updateSettings, isUpdating } = useTenantSettings();
+  const [form, setForm] = useState<TenantSettings | null>(null);
+
+  useEffect(() => {
+    if (settings && !form) setForm(settings);
+  }, [settings]);
+
+  // ── Cenník queries ──
   const { data: priceList, refetch: refetchPriceList } = useQuery({
     queryKey: ['price_list'],
     queryFn: async () => {
@@ -99,6 +110,16 @@ export default function Konfiguracia() {
     addItemMutation.mutate({ name: addForm.name.trim(), unit: addForm.unit, price_per_m2: price });
   };
 
+  const handleSaveParams = async () => {
+    if (!form) return;
+    try {
+      await updateSettings(form);
+      toast.success('Parametre uložené');
+    } catch {
+      toast.error('Chyba pri ukladaní parametrov');
+    }
+  };
+
   const deleteTarget = priceList?.find(i => i.id === deleteConfirmId);
 
   return (
@@ -141,7 +162,6 @@ export default function Konfiguracia() {
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">{item.name || item.item_type}</TableCell>
 
-                        {/* Jednotka */}
                         <TableCell>
                           {editingId === item.id ? (
                             <Select
@@ -164,7 +184,6 @@ export default function Konfiguracia() {
                           )}
                         </TableCell>
 
-                        {/* Cena */}
                         <TableCell className="text-right">
                           {editingId === item.id ? (
                             <div className="flex items-center justify-end gap-1">
@@ -184,7 +203,6 @@ export default function Konfiguracia() {
                           )}
                         </TableCell>
 
-                        {/* Akcie */}
                         <TableCell>
                           {editingId === item.id ? (
                             <div className="flex gap-1 justify-end">
@@ -218,7 +236,6 @@ export default function Konfiguracia() {
               </CardContent>
             </Card>
 
-            {/* Add form */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -272,8 +289,110 @@ export default function Konfiguracia() {
             </Card>
           </TabsContent>
 
+          {/* ── PARAMETRE VÝROBY ── */}
           <TabsContent value="parametre" className="mt-6">
-            <p className="text-muted-foreground">Sekcia sa načítava...</p>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings2 className="h-5 w-5" />
+                  Parametre výroby
+                </CardTitle>
+                <CardDescription>
+                  Základné hodnoty používané pri výpočtoch cien a spotreby materiálu
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {form && (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {/* Disk */}
+                      <div className="space-y-1.5">
+                        <Label>Cena disku kolesa (€/ks)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Používa sa pri výpočte ceny položiek typu „Disky" v zákazkách.
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={form.disk_price_per_piece}
+                            onChange={(e) => setForm(f => f ? { ...f, disk_price_per_piece: parseFloat(e.target.value) || 0 } : f)}
+                            className="font-mono w-36"
+                          />
+                          <span className="text-sm text-muted-foreground">€ / ks</span>
+                        </div>
+                      </div>
+
+                      {/* Základ */}
+                      <div className="space-y-1.5">
+                        <Label>Cena základu/podkladu (€/m²)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Cena za aplikáciu základného náteru pri dvojvrstvovom lakovaní.
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={form.zaklad_price_per_m2}
+                            onChange={(e) => setForm(f => f ? { ...f, zaklad_price_per_m2: parseFloat(e.target.value) || 0 } : f)}
+                            className="font-mono w-36"
+                          />
+                          <span className="text-sm text-muted-foreground">€ / m²</span>
+                        </div>
+                      </div>
+
+                      {/* Čistenie pištole */}
+                      <div className="space-y-1.5">
+                        <Label>Spotreba farby pri čistení pištole (kg)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Množstvo farby spotrebovanej pri každom čistení/prepláchnutí striekacej pištole.
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Input
+                            type="number"
+                            step="0.001"
+                            min="0"
+                            value={form.gun_cleaning_kg}
+                            onChange={(e) => setForm(f => f ? { ...f, gun_cleaning_kg: parseFloat(e.target.value) || 0 } : f)}
+                            className="font-mono w-36"
+                          />
+                          <span className="text-sm text-muted-foreground">kg</span>
+                        </div>
+                      </div>
+
+                      {/* Tolerancia spotreby */}
+                      <div className="space-y-1.5">
+                        <Label>Tolerancia spotreby farby (±%)</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Povolená odchýlka skutočnej spotreby od odhadovanej — používa sa pri porovnaní spotreby.
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Input
+                            type="number"
+                            step="1"
+                            min="0"
+                            max="100"
+                            value={form.consumption_tolerance_pct}
+                            onChange={(e) => setForm(f => f ? { ...f, consumption_tolerance_pct: parseFloat(e.target.value) || 0 } : f)}
+                            className="font-mono w-36"
+                          />
+                          <span className="text-sm text-muted-foreground">%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t">
+                      <Button onClick={handleSaveParams} disabled={isUpdating} className="gap-2">
+                        <Save className="h-4 w-4" />
+                        Uložiť parametre
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="struktury" className="mt-6">
