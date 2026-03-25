@@ -134,7 +134,7 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
   });
 
   // Find matching color in database
-  const findMatchingColor = (s: StructureType, g: GlossType, ral: string): Color | undefined => {
+  const findMatchingColor = (s: string, g: string, ral: string): Color | undefined => {
     return existingColors?.find(
       c => c.structure === s && c.gloss === g && c.ral_code === ral
     );
@@ -142,7 +142,7 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
 
   // Create new color mutation
   const createColorMutation = useMutation({
-    mutationFn: async (newColor: { ral_code: string; structure: StructureType; gloss: GlossType; hex_code: string }) => {
+    mutationFn: async (newColor: { ral_code: string; structure: string; gloss: string; hex_code: string }) => {
       const { data, error } = await supabase
         .from('colors')
         .insert({
@@ -175,7 +175,7 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
   });
 
   // Handle selection change
-  const handleSelectionChange = (newStructure: StructureType | '', newGloss: GlossType | '', newRalCode: string) => {
+  const handleSelectionChange = (newStructure: string, newGloss: string, newRalCode: string) => {
     setStructure(newStructure);
     setGloss(newGloss);
     setRalCode(newRalCode);
