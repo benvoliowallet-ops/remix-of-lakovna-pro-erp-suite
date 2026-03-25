@@ -26,7 +26,6 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
-import { ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
 import type { PriceListItem, OrderItemType } from '@/lib/types';
 import { SmartColorPicker } from './SmartColorPicker';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +47,7 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
   const ZAKLAD_PRICE_PER_M2 = settings.zaklad_price_per_m2;
 
   const [showCalculator, setShowCalculator] = useState(false);
+  const [unifiedType, setUnifiedType] = useState<string>('');
 
   const [formData, setFormData] = useState({
     item_type: 'standard' as OrderItemType,
@@ -166,7 +166,7 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
         throw new Error('Zadajte platnú plochu');
       }
 
-      if (!['disky', 'ine', 'doplnkova_sluzba'].includes(formData.item_type) && !formData.price_list_id) {
+      if (!['disky', 'ine', 'doplnkova_sluzba', 'stlp'].includes(formData.item_type) && !formData.price_list_id) {
         throw new Error('Vyberte cenník');
       }
 
@@ -272,13 +272,44 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
       count: '1',
       isBothSides: false,
     });
+    setUnifiedType('');
     setShowCalculator(false);
+  };
+
+  const handleUnifiedTypeChange = (value: string) => {
+    setUnifiedType(value);
+    if (['disky', 'ine', 'doplnkova_sluzba', 'stlp'].includes(value)) {
+      setFormData({
+        ...formData,
+        item_type: value as OrderItemType,
+        price_list_id: '',
+        area_m2: '',
+        add_base_coat: false,
+      });
+    } else {
+      const selectedItem = priceList?.find(p => p.id === value);
+      const nameLower = (selectedItem?.name ?? '').toLowerCase();
+      const itemType: OrderItemType =
+        nameLower.includes('lamel') || nameLower.includes('sito') ? 'lamely_sito' : 'standard';
+      setFormData({
+        ...formData,
+        item_type: itemType,
+        price_list_id: value,
+        area_m2: '',
+        add_base_coat: false,
+      });
+    }
+    setCalcData({ length: '', width: '', height: '', count: '1', isBothSides: false });
   };
 
   const colorRequired = !['disky', 'ine', 'doplnkova_sluzba', 'zaklad'].includes(formData.item_type);
 
   const getValidationErrors = (): string[] => {
     const errors: string[] = [];
+    if (!unifiedType) {
+      errors.push('Vyberte typ položky');
+      return errors;
+    }
     if (formData.item_type === 'disky') {
       if ((parseInt(formData.disk_count) || 0) <= 0) errors.push('Zadajte počet diskov');
       return errors;
@@ -294,7 +325,7 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
       if (!formData.description.trim()) errors.push('Zadajte popis služby');
       return errors;
     }
-    if (!formData.price_list_id) errors.push('Vyberte typ cenníka');
+    if (!['disky', 'ine', 'doplnkova_sluzba', 'stlp'].includes(formData.item_type) && !formData.price_list_id) errors.push('Vyberte typ cenníka');
     if (!formData.area_m2 || parseFloat(formData.area_m2) <= 0) errors.push('Zadajte plochu (m²)');
     if (colorRequired && !formData.color_id) errors.push('Vyberte farbu');
     return errors;
@@ -464,51 +495,44 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Item Type */}
+          {/* Unified typ položky */}
           <div className="space-y-2">
             <Label>Typ položky *</Label>
             <Select
-              value={formData.item_type}
-              onValueChange={(v) => {
-                setFormData({ ...formData, item_type: v as OrderItemType, area_m2: '', add_base_coat: false });
-                setCalcData({ length: '', width: '', height: '', count: '1', isBothSides: false });
-              }}
+              value={unifiedType}
+              onValueChange={handleUnifiedTypeChange}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Vyberte typ položky" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="standard">Štandard</SelectItem>
-                <SelectItem value="lamely_sito">Lamely / Sito</SelectItem>
-                <SelectItem value="stlp">Stĺp</SelectItem>
-                <SelectItem value="disky">Disky kolies (50 €/ks)</SelectItem>
+                {/* Položky z cenníka */}
+                {priceList && priceList.length > 0 && (
+                  <>
+                    <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                      Štandardné
+                    </div>
+                    {priceList.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} €/{item.unit ?? 'm²'}
+                      </SelectItem>
+                    ))}
+                    <div className="my-1 border-t border-border" />
+                  </>
+                )}
+                {/* Špeciálne typy */}
+                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                  Špeciálne
+                </div>
+                <SelectItem value="stlp">Stĺp (obvod × dĺžka)</SelectItem>
+                <SelectItem value="disky">Disky kolies ({DISK_PRICE_PER_PIECE} €/ks)</SelectItem>
                 <SelectItem value="ine">Iné (vlastná cena)</SelectItem>
-                {isAdmin && <SelectItem value="doplnkova_sluzba">Doplnková služba</SelectItem>}
+                {isAdmin && (
+                  <SelectItem value="doplnkova_sluzba">Doplnková služba</SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
-
-          {/* Price list - not for disks, ine, doplnkova_sluzba */}
-          {!['disky', 'ine', 'doplnkova_sluzba'].includes(formData.item_type) && (
-            <div className="space-y-2">
-              <Label>Cenník *</Label>
-              <Select
-                value={formData.price_list_id}
-                onValueChange={(v) => setFormData({ ...formData, price_list_id: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Vyberte cenník" />
-                </SelectTrigger>
-                <SelectContent>
-                  {priceList?.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} € / {item.unit ?? 'm²'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
 
           {/* Add base coat checkbox - not for disks, ine, doplnkova_sluzba */}
           {!['disky', 'ine', 'doplnkova_sluzba'].includes(formData.item_type) && (

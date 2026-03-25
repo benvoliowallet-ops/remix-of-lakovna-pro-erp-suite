@@ -19,7 +19,7 @@ export type Database = {
           color_name: string | null
           created_at: string | null
           density: number | null
-          gloss: Database["public"]["Enums"]["gloss_type"]
+          gloss: string
           hex_code: string | null
           id: string
           min_stock_limit: number | null
@@ -27,14 +27,14 @@ export type Database = {
           price_per_kg_purchase: number | null
           ral_code: string
           stock_kg: number | null
-          structure: Database["public"]["Enums"]["structure_type"]
+          structure: string
           tenant_id: string | null
         }
         Insert: {
           color_name?: string | null
           created_at?: string | null
           density?: number | null
-          gloss?: Database["public"]["Enums"]["gloss_type"]
+          gloss?: string
           hex_code?: string | null
           id?: string
           min_stock_limit?: number | null
@@ -42,14 +42,14 @@ export type Database = {
           price_per_kg_purchase?: number | null
           ral_code: string
           stock_kg?: number | null
-          structure?: Database["public"]["Enums"]["structure_type"]
+          structure?: string
           tenant_id?: string | null
         }
         Update: {
           color_name?: string | null
           created_at?: string | null
           density?: number | null
-          gloss?: Database["public"]["Enums"]["gloss_type"]
+          gloss?: string
           hex_code?: string | null
           id?: string
           min_stock_limit?: number | null
@@ -57,7 +57,7 @@ export type Database = {
           price_per_kg_purchase?: number | null
           ral_code?: string
           stock_kg?: number | null
-          structure?: Database["public"]["Enums"]["structure_type"]
+          structure?: string
           tenant_id?: string | null
         }
         Relationships: [
@@ -465,23 +465,29 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          item_type: Database["public"]["Enums"]["item_type"]
+          item_type: string
+          name: string | null
           price_per_m2: number
           tenant_id: string | null
+          unit: string
         }
         Insert: {
           created_at?: string | null
           id?: string
-          item_type: Database["public"]["Enums"]["item_type"]
+          item_type: string
+          name?: string | null
           price_per_m2?: number
           tenant_id?: string | null
+          unit?: string
         }
         Update: {
           created_at?: string | null
           id?: string
-          item_type?: Database["public"]["Enums"]["item_type"]
+          item_type?: string
+          name?: string | null
           price_per_m2?: number
           tenant_id?: string | null
+          unit?: string
         }
         Relationships: [
           {
@@ -583,39 +589,121 @@ export type Database = {
           },
         ]
       }
+      tenant_glosses: {
+        Row: {
+          created_at: string | null
+          id: string
+          label: string
+          sort_order: number
+          tenant_id: string
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+          tenant_id: string
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+          tenant_id?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_glosses_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_structures: {
+        Row: {
+          created_at: string | null
+          id: string
+          label: string
+          sort_order: number
+          tenant_id: string
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+          tenant_id: string
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+          tenant_id?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_structures_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           address: string | null
+          consumption_tolerance_pct: number
           created_at: string
           dic: string | null
+          disk_price_per_piece: number
+          gun_cleaning_kg: number
           ic_dph: string | null
           ico: string | null
           id: string
           name: string
           plan: string
           trial_ends_at: string
+          zaklad_price_per_m2: number
         }
         Insert: {
           address?: string | null
+          consumption_tolerance_pct?: number
           created_at?: string
           dic?: string | null
+          disk_price_per_piece?: number
+          gun_cleaning_kg?: number
           ic_dph?: string | null
           ico?: string | null
           id?: string
           name: string
           plan?: string
           trial_ends_at?: string
+          zaklad_price_per_m2?: number
         }
         Update: {
           address?: string | null
+          consumption_tolerance_pct?: number
           created_at?: string
           dic?: string | null
+          disk_price_per_piece?: number
+          gun_cleaning_kg?: number
           ic_dph?: string | null
           ico?: string | null
           id?: string
           name?: string
           plan?: string
           trial_ends_at?: string
+          zaklad_price_per_m2?: number
         }
         Relationships: []
       }
