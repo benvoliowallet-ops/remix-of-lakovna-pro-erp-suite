@@ -13,17 +13,18 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from 'sonner';
 import { Search, Filter, Paintbrush, AlertTriangle, Plus, Pencil } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS } from '@/lib/types';
 import type { Color } from '@/lib/types';
 import { findRALColor, formatRALWithName } from '@/lib/ral-colors';
 import { AddColorDialog } from '@/components/inventory/AddColorDialog';
 import { EditColorDialog } from '@/components/inventory/EditColorDialog';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
+import { useStructuresGlosses } from '@/hooks/useStructuresGlosses';
 
 export default function Inventory() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { settings } = useTenantSettings();
+  const { structures: structureOptions, glosses: glossOptions } = useStructuresGlosses();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [structureFilter, setStructureFilter] = useState<string>('all');
@@ -146,7 +147,7 @@ export default function Inventory() {
                   <SelectContent>
                     {colors?.map((color) => (
                       <SelectItem key={color.id} value={color.id}>
-                        {formatRALWithName(color.ral_code, color.color_name)} - {STRUCTURE_TYPE_LABELS[color.structure]} ({Number(color.stock_kg).toFixed(3)} kg)
+                        {formatRALWithName(color.ral_code, color.color_name)} - {structureOptions.find(s => s.value === color.structure)?.label ?? color.structure} ({Number(color.stock_kg).toFixed(3)} kg)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -196,8 +197,8 @@ export default function Inventory() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Všetky štruktúry</SelectItem>
-                {Object.entries(STRUCTURE_TYPE_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                {structureOptions.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -266,10 +267,10 @@ export default function Inventory() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">
-                        {STRUCTURE_TYPE_LABELS[color.structure]}
+                        {structureOptions.find(s => s.value === color.structure)?.label ?? color.structure}
                       </Badge>
                     </TableCell>
-                    <TableCell>{GLOSS_TYPE_LABELS[color.gloss]}</TableCell>
+                    <TableCell>{glossOptions.find(g => g.value === color.gloss)?.label ?? color.gloss}</TableCell>
                     <TableCell className={`text-right font-mono ${isLowStock(color) ? 'text-warning font-bold' : ''}`}>
                       {Number(color.stock_kg).toFixed(3)}
                     </TableCell>
