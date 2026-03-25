@@ -205,6 +205,71 @@ export default function Settings() {
     addPriceMutation.mutate({ name: newPriceName.trim(), price, unit: newPriceUnit || 'm2' });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any;
+
+  const addStructureMutation = useMutation({
+    mutationFn: async ({ value, label }: { value: string; label: string }) => {
+      const { error } = await db.from('tenant_structures').insert({
+        value: value.toLowerCase().replace(/\s+/g, '_'),
+        label,
+        sort_order: structures.length + 1,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Štruktúra pridaná');
+      queryClient.invalidateQueries({ queryKey: ['tenant-structures'] });
+      setAddingStructure(false);
+      setNewStructureValue('');
+      setNewStructureLabel('');
+    },
+    onError: () => toast.error('Chyba pri pridávaní štruktúry'),
+  });
+
+  const deleteStructureMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from('tenant_structures').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Štruktúra odstránená');
+      queryClient.invalidateQueries({ queryKey: ['tenant-structures'] });
+    },
+    onError: () => toast.error('Chyba pri mazaní štruktúry'),
+  });
+
+  const addGlossMutation = useMutation({
+    mutationFn: async ({ value, label }: { value: string; label: string }) => {
+      const { error } = await db.from('tenant_glosses').insert({
+        value: value.toLowerCase().replace(/\s+/g, '_'),
+        label,
+        sort_order: glosses.length + 1,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Lesk pridaný');
+      queryClient.invalidateQueries({ queryKey: ['tenant-glosses'] });
+      setAddingGloss(false);
+      setNewGlossValue('');
+      setNewGlossLabel('');
+    },
+    onError: () => toast.error('Chyba pri pridávaní lesku'),
+  });
+
+  const deleteGlossMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from('tenant_glosses').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Lesk odstránený');
+      queryClient.invalidateQueries({ queryKey: ['tenant-glosses'] });
+    },
+    onError: () => toast.error('Chyba pri mazaní lesku'),
+  });
+
   return (
     <MainLayout>
       <div className="space-y-6">
