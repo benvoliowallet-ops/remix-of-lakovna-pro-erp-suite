@@ -55,6 +55,7 @@ export default function OrderDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAdmin, user } = useAuth();
+  const { settings } = useTenantSettings();
   
   const [addItemDialog, setAddItemDialog] = useState(false);
   const [startWorkDialog, setStartWorkDialog] = useState(false);
