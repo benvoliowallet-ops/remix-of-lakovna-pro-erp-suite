@@ -233,11 +233,19 @@ export default function Settings() {
         {/* User Management */}
         <UserManagement />
 
-        {/* Company Edit Dialog */}
+        {/* Company Edit Dialog — edit existing */}
         <CompanyEditDialog
           company={editingCompany}
           open={!!editingCompany}
           onOpenChange={(open) => !open && setEditingCompany(null)}
+        />
+
+        {/* Company Add Dialog — create new */}
+        <CompanyEditDialog
+          company={null}
+          open={addingCompany}
+          onOpenChange={setAddingCompany}
+          onSuccess={() => setAddingCompany(false)}
         />
       </div>
     </MainLayout>
