@@ -119,8 +119,6 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
     return area;
   }, [calcData, formData.item_type]);
 
-  // Fixed price for základ: €4/m²
-  const ZAKLAD_PRICE_PER_M2 = 4;
 
   const calculatePrice = (area: number, isRework: boolean, itemType?: string) => {
     if (isRework) return 0;
