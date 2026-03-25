@@ -45,10 +45,12 @@ interface CompanyEditDialogProps {
   company: Company | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function CompanyEditDialog({ company, open, onOpenChange }: CompanyEditDialogProps) {
+export function CompanyEditDialog({ company, open, onOpenChange, onSuccess }: CompanyEditDialogProps) {
   const queryClient = useQueryClient();
+  const isNew = company === null;
 
   const form = useForm<CompanyFormData>({
     resolver: zodResolver(companySchema),
@@ -78,40 +80,69 @@ export function CompanyEditDialog({ company, open, onOpenChange }: CompanyEditDi
         vat_rate: company.vat_rate || 20,
         paint_coverage_m2_per_kg: company.paint_coverage_m2_per_kg || 8,
       });
+    } else {
+      form.reset({
+        name: '',
+        address: '',
+        ico: '',
+        dic: '',
+        ic_dph: '',
+        bank_account: '',
+        is_vat_payer: false,
+        vat_rate: 20,
+        paint_coverage_m2_per_kg: 8,
+      });
     }
-  }, [company, form]);
+  }, [company, open, form]);
 
-  const updateMutation = useMutation({
+  const saveMutation = useMutation({
     mutationFn: async (data: CompanyFormData) => {
-      if (!company) return;
-      const { error } = await supabase
-        .from('companies')
-        .update({
-          name: data.name,
-          address: data.address || null,
-          ico: data.ico || null,
-          dic: data.dic || null,
-          ic_dph: data.ic_dph || null,
-          bank_account: data.bank_account || null,
-          is_vat_payer: data.is_vat_payer,
-          vat_rate: data.is_vat_payer ? data.vat_rate : null,
-          paint_coverage_m2_per_kg: data.paint_coverage_m2_per_kg || null,
-        })
-        .eq('id', company.id);
-      if (error) throw error;
+      if (isNew) {
+        const { error } = await supabase
+          .from('companies')
+          .insert({
+            name: data.name,
+            address: data.address || null,
+            ico: data.ico || null,
+            dic: data.dic || null,
+            ic_dph: data.ic_dph || null,
+            bank_account: data.bank_account || null,
+            is_vat_payer: data.is_vat_payer,
+            vat_rate: data.is_vat_payer ? data.vat_rate : null,
+            paint_coverage_m2_per_kg: data.paint_coverage_m2_per_kg || null,
+          });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('companies')
+          .update({
+            name: data.name,
+            address: data.address || null,
+            ico: data.ico || null,
+            dic: data.dic || null,
+            ic_dph: data.ic_dph || null,
+            bank_account: data.bank_account || null,
+            is_vat_payer: data.is_vat_payer,
+            vat_rate: data.is_vat_payer ? data.vat_rate : null,
+            paint_coverage_m2_per_kg: data.paint_coverage_m2_per_kg || null,
+          })
+          .eq('id', company!.id);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
-      toast.success('Firma bola aktualizovaná');
+      toast.success(isNew ? 'Firma bola vytvorená' : 'Firma bola aktualizovaná');
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       onOpenChange(false);
+      onSuccess?.();
     },
     onError: () => {
-      toast.error('Chyba pri aktualizácii firmy');
+      toast.error(isNew ? 'Chyba pri vytváraní firmy' : 'Chyba pri aktualizácii firmy');
     },
   });
 
   const onSubmit = (data: CompanyFormData) => {
-    updateMutation.mutate(data);
+    saveMutation.mutate(data);
   };
 
   const isVatPayer = form.watch('is_vat_payer');
