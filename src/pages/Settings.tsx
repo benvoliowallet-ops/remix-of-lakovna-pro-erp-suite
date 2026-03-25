@@ -54,6 +54,49 @@ export default function Settings() {
     },
   });
 
+  // Load tenant production params
+  const { data: tenantData } = useQuery({
+    queryKey: ['tenant-prod-params'],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from('tenants') as any)
+        .select('disk_price_per_piece, zaklad_price_per_m2, gun_cleaning_kg, consumption_tolerance_pct')
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data as TenantProductionParams | null;
+    },
+  });
+
+  useEffect(() => {
+    if (tenantData) {
+      setProdParams({
+        disk_price_per_piece: Number(tenantData.disk_price_per_piece),
+        zaklad_price_per_m2: Number(tenantData.zaklad_price_per_m2),
+        gun_cleaning_kg: Number(tenantData.gun_cleaning_kg),
+        consumption_tolerance_pct: Number(tenantData.consumption_tolerance_pct),
+      });
+    }
+  }, [tenantData]);
+
+  const saveProdParams = async () => {
+    setSavingProd(true);
+    try {
+      const { error } = await (supabase.from('tenants') as any).update({
+        disk_price_per_piece: prodParams.disk_price_per_piece,
+        zaklad_price_per_m2: prodParams.zaklad_price_per_m2,
+        gun_cleaning_kg: prodParams.gun_cleaning_kg,
+        consumption_tolerance_pct: prodParams.consumption_tolerance_pct,
+      }).eq('id', (await supabase.rpc('get_tenant_id')).data);
+      if (error) throw error;
+      toast.success('Parametre výroby uložené');
+      queryClient.invalidateQueries({ queryKey: ['tenant-prod-params'] });
+    } catch {
+      toast.error('Chyba pri ukladaní parametrov');
+    } finally {
+      setSavingProd(false);
+    }
+  };
+
   const { data: priceList } = useQuery({
     queryKey: ['price-list'],
     queryFn: async () => {
