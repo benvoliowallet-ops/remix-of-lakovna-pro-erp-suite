@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -7,9 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Building2, Tag, Pencil, Check, X, Plus, Trash2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Building2, Tag, Pencil, Check, X, Plus, Trash2, SlidersHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Company, PriceListItem } from '@/lib/types';
+import type { Company, PriceListItem, TenantProductionParams } from '@/lib/types';
 import { CompanyEditDialog } from '@/components/settings/CompanyEditDialog';
 import { UserManagement } from '@/components/settings/UserManagement';
 import {

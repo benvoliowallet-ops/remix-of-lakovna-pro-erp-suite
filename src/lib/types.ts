@@ -23,6 +23,13 @@ export interface Company {
   paint_coverage_m2_per_kg?: number;
 }
 
+export interface TenantProductionParams {
+  disk_price_per_piece: number;
+  zaklad_price_per_m2: number;
+  gun_cleaning_kg: number;
+  consumption_tolerance_pct: number;
+}
+
 export interface Profile {
   id: string;
   full_name?: string;
