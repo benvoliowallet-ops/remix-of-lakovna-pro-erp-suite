@@ -432,6 +432,73 @@ export default function Settings() {
         {/* User Management */}
         <UserManagement />
 
+        {/* Production Parameters */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5" />
+                Parametre výroby
+              </CardTitle>
+              <CardDescription>
+                Výrobné hodnoty používané pri výpočtoch spotreby a cien
+              </CardDescription>
+            </div>
+            <Button size="sm" onClick={saveProdParams} disabled={savingProd}>
+              <Check className="h-4 w-4 mr-2" />
+              Uložiť
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="disk_price">Cena disku (€/ks)</Label>
+                <Input
+                  id="disk_price"
+                  type="number"
+                  step="0.01"
+                  value={prodParams.disk_price_per_piece}
+                  onChange={(e) => setProdParams(p => ({ ...p, disk_price_per_piece: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="zaklad_price">Cena základu (€/m²)</Label>
+                <Input
+                  id="zaklad_price"
+                  type="number"
+                  step="0.01"
+                  value={prodParams.zaklad_price_per_m2}
+                  onChange={(e) => setProdParams(p => ({ ...p, zaklad_price_per_m2: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="gun_cleaning">Čistenie pištoľa (kg)</Label>
+                <Input
+                  id="gun_cleaning"
+                  type="number"
+                  step="0.001"
+                  value={prodParams.gun_cleaning_kg}
+                  onChange={(e) => setProdParams(p => ({ ...p, gun_cleaning_kg: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="tolerance">Tolerancia spotreby (%)</Label>
+                <Input
+                  id="tolerance"
+                  type="number"
+                  step="0.1"
+                  value={prodParams.consumption_tolerance_pct}
+                  onChange={(e) => setProdParams(p => ({ ...p, consumption_tolerance_pct: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Company Edit Dialog — edit existing */}
         <CompanyEditDialog
           company={editingCompany}
