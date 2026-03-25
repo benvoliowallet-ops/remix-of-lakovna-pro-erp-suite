@@ -77,14 +77,15 @@ function saveRecentColor(colorId: string) {
 
 export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
   const queryClient = useQueryClient();
-  const [structure, setStructure] = useState<StructureType | ''>('');
-  const [gloss, setGloss] = useState<GlossType | ''>('');
+  const { structures, glosses, getLabelForStructure, getLabelForGloss } = useStructuresGlosses();
+  const [structure, setStructure] = useState<string>('');
+  const [gloss, setGloss] = useState<string>('');
   const [ralCode, setRalCode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [pendingColor, setPendingColor] = useState<{ structure: StructureType; gloss: GlossType; ralCode: string; hexCode: string } | null>(null);
+  const [pendingColor, setPendingColor] = useState<{ structure: string; gloss: string; ralCode: string; hexCode: string } | null>(null);
   const [recentColorIds, setRecentColorIds] = useState<string[]>([]);
 
   // Load recent colors on mount
