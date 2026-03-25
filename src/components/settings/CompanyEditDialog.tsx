@@ -151,9 +151,9 @@ export function CompanyEditDialog({ company, open, onOpenChange, onSuccess }: Co
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Upraviť firmu</DialogTitle>
+          <DialogTitle>{isNew ? 'Pridať firmu' : 'Upraviť firmu'}</DialogTitle>
           <DialogDescription>
-            Upravte údaje firmy pre fakturáciu
+            {isNew ? 'Vytvorte novú firmu pre fakturáciu' : 'Upravte údaje firmy pre fakturáciu'}
           </DialogDescription>
         </DialogHeader>
 
