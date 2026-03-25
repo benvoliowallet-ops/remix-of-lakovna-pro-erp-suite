@@ -8,11 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building2, Tag, Pencil, Check, X, Plus, Trash2, SlidersHorizontal } from 'lucide-react';
+import { Building2, Tag, Pencil, Check, X, Plus, Trash2, SlidersHorizontal, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Company, PriceListItem, TenantProductionParams } from '@/lib/types';
 import { CompanyEditDialog } from '@/components/settings/CompanyEditDialog';
 import { UserManagement } from '@/components/settings/UserManagement';
+import { useStructuresGlosses, type TenantOption } from '@/hooks/useStructuresGlosses';
 import {
   AlertDialog,
   AlertDialogAction,
