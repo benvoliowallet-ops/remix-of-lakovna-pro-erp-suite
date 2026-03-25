@@ -21,6 +21,7 @@ import {
 import { Plus, Trash2, Calculator, ChevronDown, Package, AlertTriangle, AlertCircle } from 'lucide-react';
 import { ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
 import type { PriceListItem, OrderItemType } from '@/lib/types';
+
 import { SmartColorPicker } from './SmartColorPicker';
 import { cn } from '@/lib/utils';
 import { parseLocalizedNumber } from '@/lib/parse-number';

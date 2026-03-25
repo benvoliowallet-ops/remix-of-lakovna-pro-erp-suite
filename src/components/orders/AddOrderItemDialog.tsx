@@ -26,7 +26,6 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
-import { ORDER_ITEM_TYPE_LABELS } from '@/lib/types';
 import type { PriceListItem, OrderItemType } from '@/lib/types';
 import { SmartColorPicker } from './SmartColorPicker';
 import { Badge } from '@/components/ui/badge';
