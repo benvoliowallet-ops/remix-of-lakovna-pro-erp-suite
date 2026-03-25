@@ -226,16 +226,8 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
     const diskCount = parseInt(formData.disk_count) || 1;
 
     // Validate
-    if (formData.item_type === 'ine') {
-      const unitPrice = parseLocalizedNumber(formData.unit_price) || 0;
-      const qty = parseInt(formData.quantity) || 0;
-      if (unitPrice <= 0 || qty <= 0) return;
-    } else if (formData.item_type === 'doplnkova_sluzba') {
-      const servicePrice = parseLocalizedNumber(formData.service_price) || 0;
-      const serviceQty = parseInt(formData.service_quantity) || 0;
-      if (servicePrice <= 0 || serviceQty <= 0 || !formData.description.trim()) return;
-    } else if (formData.item_type !== 'disky' && (isNaN(area) || area <= 0)) return;
-    if (!['disky', 'ine', 'doplnkova_sluzba'].includes(formData.item_type) && !formData.price_list_id) return;
+    if (!unifiedType) return;
+    if (!['disky', 'ine', 'doplnkova_sluzba', 'stlp'].includes(formData.item_type) && !formData.price_list_id) return;
 
     const baseId = crypto.randomUUID();
     const topId = crypto.randomUUID();
