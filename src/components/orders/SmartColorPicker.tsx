@@ -29,15 +29,16 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { RAL_COLORS, findRALColor, formatRALWithName, type RALColor } from '@/lib/ral-colors';
 import { STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS } from '@/lib/types';
-import type { StructureType, GlossType, Color } from '@/lib/types';
+import type { Color } from '@/lib/types';
+import { useStructuresGlosses } from '@/hooks/useStructuresGlosses';
 
 interface SmartColorPickerProps {
   value?: string; // color_id
   onChange: (colorId: string) => void;
 }
 
-const STRUCTURE_OPTIONS: StructureType[] = ['hladka', 'jemna', 'hruba', 'antik', 'kladivkova'];
-const GLOSS_OPTIONS: GlossType[] = ['leskle', 'polomatne', 'matne', 'hlboko_matne', 'metalicke', 'fluorescentne', 'glitrove', 'perletove', 'satenovane'];
+const STRUCTURE_OPTIONS: string[] = ['hladka', 'jemna', 'hruba', 'antik', 'kladivkova'];
+const GLOSS_OPTIONS: string[] = ['leskle', 'polomatne', 'matne', 'hlboko_matne', 'metalicke', 'fluorescentne', 'glitrove', 'perletove', 'satenovane'];
 
 // RAL color family groups
 const RAL_FAMILIES: { name: string; range: [number, number]; color: string }[] = [
