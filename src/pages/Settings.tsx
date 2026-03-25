@@ -575,7 +575,174 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Company Edit Dialog — edit existing */}
+        {/* Structures & Glosses */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Structures */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Layers className="h-5 w-5" />
+                  Štruktúry povrchu
+                </CardTitle>
+                <CardDescription>Dostupné štruktúry pri pridávaní farieb</CardDescription>
+              </div>
+              <Button size="sm" onClick={() => setAddingStructure(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Pridať
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Hodnota</TableHead>
+                    <TableHead>Názov</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {structures.map((s: TenantOption) => (
+                    <TableRow key={s.id}>
+                      <TableCell className="font-mono text-sm text-muted-foreground">{s.value}</TableCell>
+                      <TableCell className="font-medium">{s.label}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm" variant="ghost"
+                          onClick={() => deleteStructureMutation.mutate(s.id)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {addingStructure && (
+                    <TableRow>
+                      <TableCell>
+                        <Input
+                          value={newStructureValue}
+                          onChange={(e) => setNewStructureValue(e.target.value)}
+                          placeholder="napr. perla"
+                          className="h-8 font-mono"
+                          autoFocus
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={newStructureLabel}
+                          onChange={(e) => setNewStructureLabel(e.target.value)}
+                          placeholder="napr. Perla"
+                          className="h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newStructureValue && newStructureLabel)
+                              addStructureMutation.mutate({ value: newStructureValue, label: newStructureLabel });
+                            if (e.key === 'Escape') setAddingStructure(false);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost"
+                            onClick={() => newStructureValue && newStructureLabel && addStructureMutation.mutate({ value: newStructureValue, label: newStructureLabel })}
+                            className="h-8 w-8 p-0 text-success hover:text-success hover:bg-success/10"
+                          ><Check className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost"
+                            onClick={() => setAddingStructure(false)}
+                            className="h-8 w-8 p-0 text-muted-foreground"
+                          ><X className="h-4 w-4" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Glosses */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Layers className="h-5 w-5" />
+                  Stupne lesku
+                </CardTitle>
+                <CardDescription>Dostupné lesky pri pridávaní farieb</CardDescription>
+              </div>
+              <Button size="sm" onClick={() => setAddingGloss(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Pridať
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Hodnota</TableHead>
+                    <TableHead>Názov</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {glosses.map((g: TenantOption) => (
+                    <TableRow key={g.id}>
+                      <TableCell className="font-mono text-sm text-muted-foreground">{g.value}</TableCell>
+                      <TableCell className="font-medium">{g.label}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm" variant="ghost"
+                          onClick={() => deleteGlossMutation.mutate(g.id)}
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {addingGloss && (
+                    <TableRow>
+                      <TableCell>
+                        <Input
+                          value={newGlossValue}
+                          onChange={(e) => setNewGlossValue(e.target.value)}
+                          placeholder="napr. ultra_matne"
+                          className="h-8 font-mono"
+                          autoFocus
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={newGlossLabel}
+                          onChange={(e) => setNewGlossLabel(e.target.value)}
+                          placeholder="napr. Ultra matné"
+                          className="h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newGlossValue && newGlossLabel)
+                              addGlossMutation.mutate({ value: newGlossValue, label: newGlossLabel });
+                            if (e.key === 'Escape') setAddingGloss(false);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost"
+                            onClick={() => newGlossValue && newGlossLabel && addGlossMutation.mutate({ value: newGlossValue, label: newGlossLabel })}
+                            className="h-8 w-8 p-0 text-success hover:text-success hover:bg-success/10"
+                          ><Check className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost"
+                            onClick={() => setAddingGloss(false)}
+                            className="h-8 w-8 p-0 text-muted-foreground"
+                          ><X className="h-4 w-4" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
         <CompanyEditDialog
           company={editingCompany}
           open={!!editingCompany}
