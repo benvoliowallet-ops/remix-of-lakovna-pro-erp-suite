@@ -24,7 +24,7 @@ export default function Inventory() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { settings } = useTenantSettings();
-  const { structures: structureOptions } = useStructuresGlosses();
+  const { structures: structureOptions, glosses: glossOptions } = useStructuresGlosses();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [structureFilter, setStructureFilter] = useState<string>('all');
@@ -270,7 +270,7 @@ export default function Inventory() {
                         {structureOptions.find(s => s.value === color.structure)?.label ?? color.structure}
                       </Badge>
                     </TableCell>
-                    <TableCell>{GLOSS_TYPE_LABELS[color.gloss]}</TableCell>
+                    <TableCell>{glossOptions.find(g => g.value === color.gloss)?.label ?? color.gloss}</TableCell>
                     <TableCell className={`text-right font-mono ${isLowStock(color) ? 'text-warning font-bold' : ''}`}>
                       {Number(color.stock_kg).toFixed(3)}
                     </TableCell>
