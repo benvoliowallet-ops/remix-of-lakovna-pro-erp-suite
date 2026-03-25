@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -7,9 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Building2, Tag, Pencil, Check, X, Plus, Trash2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Building2, Tag, Pencil, Check, X, Plus, Trash2, SlidersHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Company, PriceListItem } from '@/lib/types';
+import type { Company, PriceListItem, TenantProductionParams } from '@/lib/types';
 import { CompanyEditDialog } from '@/components/settings/CompanyEditDialog';
 import { UserManagement } from '@/components/settings/UserManagement';
 import {
@@ -35,6 +36,15 @@ export default function Settings() {
   const [newPriceValue, setNewPriceValue] = useState('');
   const [newPriceUnit, setNewPriceUnit] = useState('m2');
 
+  // Production params state
+  const [prodParams, setProdParams] = useState<TenantProductionParams>({
+    disk_price_per_piece: 50,
+    zaklad_price_per_m2: 4,
+    gun_cleaning_kg: 0.3,
+    consumption_tolerance_pct: 15,
+  });
+  const [savingProd, setSavingProd] = useState(false);
+
   const { data: companies } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
@@ -43,6 +53,49 @@ export default function Settings() {
       return data as Company[];
     },
   });
+
+  // Load tenant production params
+  const { data: tenantData } = useQuery({
+    queryKey: ['tenant-prod-params'],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from('tenants') as any)
+        .select('disk_price_per_piece, zaklad_price_per_m2, gun_cleaning_kg, consumption_tolerance_pct')
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data as TenantProductionParams | null;
+    },
+  });
+
+  useEffect(() => {
+    if (tenantData) {
+      setProdParams({
+        disk_price_per_piece: Number(tenantData.disk_price_per_piece),
+        zaklad_price_per_m2: Number(tenantData.zaklad_price_per_m2),
+        gun_cleaning_kg: Number(tenantData.gun_cleaning_kg),
+        consumption_tolerance_pct: Number(tenantData.consumption_tolerance_pct),
+      });
+    }
+  }, [tenantData]);
+
+  const saveProdParams = async () => {
+    setSavingProd(true);
+    try {
+      const { error } = await (supabase.from('tenants') as any).update({
+        disk_price_per_piece: prodParams.disk_price_per_piece,
+        zaklad_price_per_m2: prodParams.zaklad_price_per_m2,
+        gun_cleaning_kg: prodParams.gun_cleaning_kg,
+        consumption_tolerance_pct: prodParams.consumption_tolerance_pct,
+      }).eq('id', (await supabase.rpc('get_tenant_id')).data);
+      if (error) throw error;
+      toast.success('Parametre výroby uložené');
+      queryClient.invalidateQueries({ queryKey: ['tenant-prod-params'] });
+    } catch {
+      toast.error('Chyba pri ukladaní parametrov');
+    } finally {
+      setSavingProd(false);
+    }
+  };
 
   const { data: priceList } = useQuery({
     queryKey: ['price-list'],
@@ -378,6 +431,73 @@ export default function Settings() {
 
         {/* User Management */}
         <UserManagement />
+
+        {/* Production Parameters */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5" />
+                Parametre výroby
+              </CardTitle>
+              <CardDescription>
+                Výrobné hodnoty používané pri výpočtoch spotreby a cien
+              </CardDescription>
+            </div>
+            <Button size="sm" onClick={saveProdParams} disabled={savingProd}>
+              <Check className="h-4 w-4 mr-2" />
+              Uložiť
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="disk_price">Cena disku (€/ks)</Label>
+                <Input
+                  id="disk_price"
+                  type="number"
+                  step="0.01"
+                  value={prodParams.disk_price_per_piece}
+                  onChange={(e) => setProdParams(p => ({ ...p, disk_price_per_piece: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="zaklad_price">Cena základu (€/m²)</Label>
+                <Input
+                  id="zaklad_price"
+                  type="number"
+                  step="0.01"
+                  value={prodParams.zaklad_price_per_m2}
+                  onChange={(e) => setProdParams(p => ({ ...p, zaklad_price_per_m2: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="gun_cleaning">Čistenie pištoľa (kg)</Label>
+                <Input
+                  id="gun_cleaning"
+                  type="number"
+                  step="0.001"
+                  value={prodParams.gun_cleaning_kg}
+                  onChange={(e) => setProdParams(p => ({ ...p, gun_cleaning_kg: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="tolerance">Tolerancia spotreby (%)</Label>
+                <Input
+                  id="tolerance"
+                  type="number"
+                  step="0.1"
+                  value={prodParams.consumption_tolerance_pct}
+                  onChange={(e) => setProdParams(p => ({ ...p, consumption_tolerance_pct: parseFloat(e.target.value) || 0 }))}
+                  className="font-mono"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Company Edit Dialog — edit existing */}
         <CompanyEditDialog
