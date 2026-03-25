@@ -27,6 +27,8 @@ import {
 
 export default function Settings() {
   const queryClient = useQueryClient();
+  const { structures, glosses } = useStructuresGlosses();
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
@@ -36,6 +38,14 @@ export default function Settings() {
   const [newPriceName, setNewPriceName] = useState('');
   const [newPriceValue, setNewPriceValue] = useState('');
   const [newPriceUnit, setNewPriceUnit] = useState('m2');
+
+  // Structures/glosses add state
+  const [addingStructure, setAddingStructure] = useState(false);
+  const [newStructureValue, setNewStructureValue] = useState('');
+  const [newStructureLabel, setNewStructureLabel] = useState('');
+  const [addingGloss, setAddingGloss] = useState(false);
+  const [newGlossValue, setNewGlossValue] = useState('');
+  const [newGlossLabel, setNewGlossLabel] = useState('');
 
   // Production params state
   const [prodParams, setProdParams] = useState<TenantProductionParams>({
