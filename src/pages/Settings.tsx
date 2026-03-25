@@ -73,7 +73,7 @@ export default function Settings() {
 
   const addPriceMutation = useMutation({
     mutationFn: async ({ name, price, unit }: { name: string; price: number; unit: string }) => {
-      const { error } = await supabase.from('price_list').insert({
+      const { error } = await (supabase.from('price_list') as any).insert({
         item_type: name.toLowerCase().replace(/\s+/g, '_'),
         name,
         unit,
