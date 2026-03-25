@@ -62,8 +62,8 @@ export interface Customer {
 export interface Color {
   id: string;
   ral_code: string;
-  structure: StructureType;
-  gloss: GlossType;
+  structure: string;
+  gloss: string;
   hex_code?: string;
   color_name?: string;
   density: number;
