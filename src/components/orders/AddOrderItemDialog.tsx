@@ -502,7 +502,7 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
                 <SelectContent>
                   {priceList?.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
-                      {ITEM_TYPE_LABELS[item.item_type]} - {Number(item.price_per_m2).toFixed(2)} €/m²
+                      {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} € / {item.unit ?? 'm²'}
                     </SelectItem>
                   ))}
                 </SelectContent>

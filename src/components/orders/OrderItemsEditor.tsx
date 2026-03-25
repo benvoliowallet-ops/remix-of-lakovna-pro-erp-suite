@@ -501,7 +501,7 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
                           isBaseCoat && "text-destructive"
                         )}>
                           {index + 1}. {ORDER_ITEM_TYPE_LABELS[item.item_type]}
-                          {priceItem && ` (${ITEM_TYPE_LABELS[priceItem.item_type]})`}
+                          {priceItem && ` (${priceItem.name ?? priceItem.item_type})`}
                         </span>
                         {isBaseCoat && (
                           <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded font-bold">
@@ -613,7 +613,7 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
                   <SelectContent>
                     {priceList?.map((item) => (
                       <SelectItem key={item.id} value={item.id}>
-                        {ITEM_TYPE_LABELS[item.item_type]} - {Number(item.price_per_m2).toFixed(2)} €/m²
+                        {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} € / {item.unit ?? 'm²'}
                       </SelectItem>
                     ))}
                   </SelectContent>
