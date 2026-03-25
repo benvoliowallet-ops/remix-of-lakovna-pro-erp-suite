@@ -473,6 +473,10 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
 
   const getValidationErrors = (): string[] => {
     const errors: string[] = [];
+    if (!unifiedType) {
+      errors.push('Vyberte typ položky');
+      return errors;
+    }
     if (formData.item_type === 'disky') {
       if ((parseInt(formData.disk_count) || 0) <= 0) errors.push('Zadajte počet diskov');
       return errors;
@@ -488,7 +492,7 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
       if (!formData.description.trim()) errors.push('Zadajte popis služby');
       return errors;
     }
-    if (!formData.price_list_id) errors.push('Vyberte typ cenníka');
+    if (!['disky', 'ine', 'doplnkova_sluzba', 'stlp'].includes(formData.item_type) && !formData.price_list_id) errors.push('Vyberte typ cenníka');
     if (!formData.area_m2 || parseLocalizedNumber(formData.area_m2) <= 0) errors.push('Zadajte plochu (m²)');
     if (colorRequired && !formData.color_id) errors.push('Vyberte farbu');
     return errors;
