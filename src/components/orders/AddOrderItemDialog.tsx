@@ -166,7 +166,7 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
         throw new Error('Zadajte platnú plochu');
       }
 
-      if (!['disky', 'ine', 'doplnkova_sluzba'].includes(formData.item_type) && !formData.price_list_id) {
+      if (!['disky', 'ine', 'doplnkova_sluzba', 'stlp'].includes(formData.item_type) && !formData.price_list_id) {
         throw new Error('Vyberte cenník');
       }
 
