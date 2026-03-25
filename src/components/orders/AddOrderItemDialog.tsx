@@ -47,6 +47,7 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
   const ZAKLAD_PRICE_PER_M2 = settings.zaklad_price_per_m2;
 
   const [showCalculator, setShowCalculator] = useState(false);
+  const [unifiedType, setUnifiedType] = useState<string>('');
 
   const [formData, setFormData] = useState({
     item_type: 'standard' as OrderItemType,
