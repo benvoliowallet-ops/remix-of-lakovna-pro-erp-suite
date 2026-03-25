@@ -596,51 +596,44 @@ export function OrderItemsEditor({ items, onChange, isVatPayer, isAdmin }: Order
               </Button>
             </div>
 
-            {/* Item Type Selection */}
+            {/* Unified typ položky */}
             <div className="space-y-2">
               <Label>Typ položky *</Label>
               <Select
-                value={formData.item_type}
-                onValueChange={(v) => {
-                  setFormData({ ...formData, item_type: v as OrderItemType, area_m2: '', add_base_coat: false });
-                  setCalcData({ length: '', width: '', height: '', count: '1', isBothSides: false });
-                }}
+                value={unifiedType}
+                onValueChange={handleUnifiedTypeChange}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Vyberte typ položky" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="standard">Štandard</SelectItem>
-                  <SelectItem value="lamely_sito">Lamely / Sito</SelectItem>
-                  <SelectItem value="stlp">Stĺp</SelectItem>
-                  <SelectItem value="disky">Disky kolies (50 €/ks)</SelectItem>
+                  {/* Položky z cenníka */}
+                  {priceList && priceList.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                        Štandardné
+                      </div>
+                      {priceList.map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} €/{item.unit ?? 'm²'}
+                        </SelectItem>
+                      ))}
+                      <div className="my-1 border-t border-border" />
+                    </>
+                  )}
+                  {/* Špeciálne typy */}
+                  <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                    Špeciálne
+                  </div>
+                  <SelectItem value="stlp">Stĺp (obvod × dĺžka)</SelectItem>
+                  <SelectItem value="disky">Disky kolies ({DISK_PRICE_PER_PIECE} €/ks)</SelectItem>
                   <SelectItem value="ine">Iné (vlastná cena)</SelectItem>
-                  {isAdmin && <SelectItem value="doplnkova_sluzba">Doplnková služba</SelectItem>}
+                  {isAdmin && (
+                    <SelectItem value="doplnkova_sluzba">Doplnková služba</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Price list item - not for disks, ine, doplnkova_sluzba */}
-            {!['disky', 'ine', 'doplnkova_sluzba'].includes(formData.item_type) && (
-              <div className="space-y-2">
-                <Label>Cenník *</Label>
-                <Select
-                  value={formData.price_list_id}
-                  onValueChange={(v) => setFormData({ ...formData, price_list_id: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Vyberte cenník" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {priceList?.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.name ?? item.item_type} — {Number(item.price_per_m2).toFixed(2)} € / {item.unit ?? 'm²'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
 
             {/* Add base coat checkbox - not for disks, ine, doplnkova_sluzba */}
             {!['disky', 'ine', 'doplnkova_sluzba'].includes(formData.item_type) && (
