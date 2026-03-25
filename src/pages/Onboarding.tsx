@@ -94,7 +94,8 @@ export default function Onboarding() {
       }
 
       toast.success('Pracovisko bolo úspešne vytvorené!');
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      await queryClient.invalidateQueries({ queryKey: ['tenant-status'] });
       navigate('/dashboard');
     } catch {
       toast.error('Nastala neočakávaná chyba. Skúste to znova.');
