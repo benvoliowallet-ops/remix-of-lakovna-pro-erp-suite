@@ -68,7 +68,9 @@ export interface Color {
 
 export interface PriceListItem {
   id: string;
-  item_type: ItemType;
+  item_type: string;
+  name?: string;
+  unit?: string;
   price_per_m2: number;
 }
 

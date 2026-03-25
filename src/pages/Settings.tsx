@@ -7,12 +7,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Building2, Tag, Pencil, Check, X, Plus } from 'lucide-react';
+import { Building2, Tag, Pencil, Check, X, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { ITEM_TYPE_LABELS } from '@/lib/types';
 import type { Company, PriceListItem } from '@/lib/types';
 import { CompanyEditDialog } from '@/components/settings/CompanyEditDialog';
 import { UserManagement } from '@/components/settings/UserManagement';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -20,6 +29,11 @@ export default function Settings() {
   const [editValue, setEditValue] = useState('');
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [addingCompany, setAddingCompany] = useState(false);
+  const [deletingPriceId, setDeletingPriceId] = useState<string | null>(null);
+  const [addingPrice, setAddingPrice] = useState(false);
+  const [newPriceName, setNewPriceName] = useState('');
+  const [newPriceValue, setNewPriceValue] = useState('');
+  const [newPriceUnit, setNewPriceUnit] = useState('m2');
 
   const { data: companies } = useQuery({
     queryKey: ['companies'],
@@ -57,6 +71,44 @@ export default function Settings() {
     },
   });
 
+  const addPriceMutation = useMutation({
+    mutationFn: async ({ name, price, unit }: { name: string; price: number; unit: string }) => {
+      const { error } = await (supabase.from('price_list') as any).insert({
+        item_type: name.toLowerCase().replace(/\s+/g, '_'),
+        name,
+        unit,
+        price_per_m2: price,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Položka pridaná');
+      queryClient.invalidateQueries({ queryKey: ['price-list'] });
+      setAddingPrice(false);
+      setNewPriceName('');
+      setNewPriceValue('');
+      setNewPriceUnit('m2');
+    },
+    onError: () => {
+      toast.error('Chyba pri pridávaní položky');
+    },
+  });
+
+  const deletePriceMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('price_list').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Položka odstránená');
+      queryClient.invalidateQueries({ queryKey: ['price-list'] });
+      setDeletingPriceId(null);
+    },
+    onError: () => {
+      toast.error('Chyba pri mazaní položky');
+    },
+  });
+
   const startEditing = (item: PriceListItem) => {
     setEditingId(item.id);
     setEditValue(Number(item.price_per_m2).toFixed(2));
@@ -74,6 +126,19 @@ export default function Settings() {
       return;
     }
     updatePriceMutation.mutate({ id, price });
+  };
+
+  const saveNewPrice = () => {
+    if (!newPriceName.trim()) {
+      toast.error('Zadajte názov položky');
+      return;
+    }
+    const price = parseFloat(newPriceValue);
+    if (isNaN(price) || price < 0) {
+      toast.error('Zadajte platnú cenu');
+      return;
+    }
+    addPriceMutation.mutate({ name: newPriceName.trim(), price, unit: newPriceUnit || 'm2' });
   };
 
   return (
@@ -143,29 +208,39 @@ export default function Settings() {
 
           {/* Price List */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Tag className="h-5 w-5" />
-                Cenník charakterov
-              </CardTitle>
-              <CardDescription>
-                Kliknite na cenu pre úpravu
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Tag className="h-5 w-5" />
+                  Cenník charakterov
+                </CardTitle>
+                <CardDescription>
+                  Kliknite na cenu pre úpravu
+                </CardDescription>
+              </div>
+              <Button size="sm" onClick={() => setAddingPrice(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Pridať
+              </Button>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Typ</TableHead>
-                    <TableHead className="text-right">Cena/m²</TableHead>
-                    <TableHead className="w-[100px]"></TableHead>
+                    <TableHead>Názov</TableHead>
+                    <TableHead>Jednotka</TableHead>
+                    <TableHead className="text-right">Cena</TableHead>
+                    <TableHead className="w-[80px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {priceList?.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">
-                        {ITEM_TYPE_LABELS[item.item_type]}
+                        {item.name || item.item_type}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {item.unit || 'm²'}
                       </TableCell>
                       <TableCell className="text-right">
                         {editingId === item.id ? (
@@ -212,18 +287,89 @@ export default function Settings() {
                             </Button>
                           </div>
                         ) : (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => startEditing(item)}
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-accent"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => startEditing(item)}
+                              className="h-8 w-8 p-0 text-muted-foreground hover:text-accent"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setDeletingPriceId(item.id)}
+                              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         )}
                       </TableCell>
                     </TableRow>
                   ))}
+
+                  {/* Add new price row */}
+                  {addingPrice && (
+                    <TableRow>
+                      <TableCell>
+                        <Input
+                          value={newPriceName}
+                          onChange={(e) => setNewPriceName(e.target.value)}
+                          placeholder="Názov (napr. Rám)"
+                          className="h-8"
+                          autoFocus
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={newPriceUnit}
+                          onChange={(e) => setNewPriceUnit(e.target.value)}
+                          placeholder="m2"
+                          className="h-8 w-16"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-2">
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={newPriceValue}
+                            onChange={(e) => setNewPriceValue(e.target.value)}
+                            placeholder="0.00"
+                            className="w-24 h-8 font-mono text-right"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveNewPrice();
+                              if (e.key === 'Escape') setAddingPrice(false);
+                            }}
+                          />
+                          <span className="text-muted-foreground">€</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={saveNewPrice}
+                            disabled={addPriceMutation.isPending}
+                            className="h-8 w-8 p-0 text-success hover:text-success hover:bg-success/10"
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setAddingPrice(false)}
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -247,6 +393,27 @@ export default function Settings() {
           onOpenChange={setAddingCompany}
           onSuccess={() => setAddingCompany(false)}
         />
+
+        {/* Delete price list item confirmation */}
+        <AlertDialog open={!!deletingPriceId} onOpenChange={(open) => !open && setDeletingPriceId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Odstrániť položku cenníka?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Táto akcia je nevratná. Položka bude trvalo odstránená z cenníka.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Zrušiť</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => deletingPriceId && deletePriceMutation.mutate(deletingPriceId)}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Odstrániť
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </MainLayout>
   );
