@@ -148,7 +148,7 @@ export default function Inventory() {
                   <SelectContent>
                     {colors?.map((color) => (
                       <SelectItem key={color.id} value={color.id}>
-                        {formatRALWithName(color.ral_code, color.color_name)} - {STRUCTURE_TYPE_LABELS[color.structure]} ({Number(color.stock_kg).toFixed(3)} kg)
+                        {formatRALWithName(color.ral_code, color.color_name)} - {structureOptions.find(s => s.value === color.structure)?.label ?? color.structure} ({Number(color.stock_kg).toFixed(3)} kg)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -198,8 +198,8 @@ export default function Inventory() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Všetky štruktúry</SelectItem>
-                {Object.entries(STRUCTURE_TYPE_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                {structureOptions.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -268,7 +268,7 @@ export default function Inventory() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">
-                        {STRUCTURE_TYPE_LABELS[color.structure]}
+                        {structureOptions.find(s => s.value === color.structure)?.label ?? color.structure}
                       </Badge>
                     </TableCell>
                     <TableCell>{GLOSS_TYPE_LABELS[color.gloss]}</TableCell>
