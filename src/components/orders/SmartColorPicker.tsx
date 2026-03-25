@@ -143,8 +143,7 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
   // Create new color mutation
   const createColorMutation = useMutation({
     mutationFn: async (newColor: { ral_code: string; structure: string; gloss: string; hex_code: string }) => {
-      const { data, error } = await supabase
-        .from('colors')
+      const { data, error } = await (supabase.from('colors') as any)
         .insert({
           ral_code: newColor.ral_code,
           structure: newColor.structure,
@@ -345,15 +344,15 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
               <Label className="text-sm font-medium">Štruktúra povrchu</Label>
               <Select
                 value={structure}
-                onValueChange={(v) => handleSelectionChange(v as StructureType, gloss, ralCode)}
+                onValueChange={(v) => handleSelectionChange(v, gloss, ralCode)}
               >
                 <SelectTrigger className="min-h-[56px] text-base">
                   <SelectValue placeholder="Vyberte štruktúru" />
                 </SelectTrigger>
                 <SelectContent>
-                  {STRUCTURE_OPTIONS.map((s) => (
-                    <SelectItem key={s} value={s} className="min-h-[48px]">
-                      {STRUCTURE_TYPE_LABELS[s]}
+                  {(structures.length > 0 ? structures : STRUCTURE_OPTIONS.map(v => ({ value: v, label: v }))).map((s) => (
+                    <SelectItem key={s.value} value={s.value} className="min-h-[48px]">
+                      {s.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
