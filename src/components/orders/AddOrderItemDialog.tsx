@@ -272,7 +272,34 @@ export function AddOrderItemDialog({ orderId, isVatPayer, open, onOpenChange, is
       count: '1',
       isBothSides: false,
     });
+    setUnifiedType('');
     setShowCalculator(false);
+  };
+
+  const handleUnifiedTypeChange = (value: string) => {
+    setUnifiedType(value);
+    if (['disky', 'ine', 'doplnkova_sluzba', 'stlp'].includes(value)) {
+      setFormData({
+        ...formData,
+        item_type: value as OrderItemType,
+        price_list_id: '',
+        area_m2: '',
+        add_base_coat: false,
+      });
+    } else {
+      const selectedItem = priceList?.find(p => p.id === value);
+      const nameLower = (selectedItem?.name ?? '').toLowerCase();
+      const itemType: OrderItemType =
+        nameLower.includes('lamel') || nameLower.includes('sito') ? 'lamely_sito' : 'standard';
+      setFormData({
+        ...formData,
+        item_type: itemType,
+        price_list_id: value,
+        area_m2: '',
+        add_base_coat: false,
+      });
+    }
+    setCalcData({ length: '', width: '', height: '', count: '1', isBothSides: false });
   };
 
   const colorRequired = !['disky', 'ine', 'doplnkova_sluzba', 'zaklad'].includes(formData.item_type);
