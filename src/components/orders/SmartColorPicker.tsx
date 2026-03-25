@@ -363,15 +363,15 @@ export function SmartColorPicker({ value, onChange }: SmartColorPickerProps) {
               <Label className="text-sm font-medium">Stupeň lesku</Label>
               <Select
                 value={gloss}
-                onValueChange={(v) => handleSelectionChange(structure, v as GlossType, ralCode)}
+                onValueChange={(v) => handleSelectionChange(structure, v, ralCode)}
               >
                 <SelectTrigger className="min-h-[56px] text-base">
                   <SelectValue placeholder="Vyberte lesk" />
                 </SelectTrigger>
                 <SelectContent>
-                  {GLOSS_OPTIONS.map((g) => (
-                    <SelectItem key={g} value={g} className="min-h-[48px]">
-                      {GLOSS_TYPE_LABELS[g]}
+                  {(glosses.length > 0 ? glosses : GLOSS_OPTIONS.map(v => ({ value: v, label: v }))).map((g) => (
+                    <SelectItem key={g.value} value={g.value} className="min-h-[48px]">
+                      {g.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
