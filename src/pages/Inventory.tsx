@@ -13,17 +13,19 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from 'sonner';
 import { Search, Filter, Paintbrush, AlertTriangle, Plus, Pencil } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS } from '@/lib/types';
+import { GLOSS_TYPE_LABELS } from '@/lib/types';
 import type { Color } from '@/lib/types';
 import { findRALColor, formatRALWithName } from '@/lib/ral-colors';
 import { AddColorDialog } from '@/components/inventory/AddColorDialog';
 import { EditColorDialog } from '@/components/inventory/EditColorDialog';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
+import { useStructuresGlosses } from '@/hooks/useStructuresGlosses';
 
 export default function Inventory() {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { settings } = useTenantSettings();
+  const { structures: structureOptions } = useStructuresGlosses();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [structureFilter, setStructureFilter] = useState<string>('all');
