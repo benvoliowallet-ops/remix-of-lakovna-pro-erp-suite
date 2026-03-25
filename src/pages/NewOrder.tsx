@@ -292,6 +292,13 @@ export default function NewOrder() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {(!companies || companies.length === 0) && (
+                <div className="rounded-md bg-muted p-4 text-sm text-muted-foreground">
+                  Nemáte pridanú žiadnu firmu. Pridajte firmu v{' '}
+                  <a href="/nastavenia" className="underline text-primary">Nastaveniach</a>{' '}
+                  pred vytvorením zákazky.
+                </div>
+              )}
               <div className="grid gap-3">
                 {companies?.map((company) => (
                   <div

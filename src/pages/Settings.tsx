@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Building2, Tag, Pencil, Check, X } from 'lucide-react';
+import { Building2, Tag, Pencil, Check, X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { ITEM_TYPE_LABELS } from '@/lib/types';
 import type { Company, PriceListItem } from '@/lib/types';
@@ -19,6 +19,7 @@ export default function Settings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [addingCompany, setAddingCompany] = useState(false);
 
   const { data: companies } = useQuery({
     queryKey: ['companies'],
@@ -86,14 +87,20 @@ export default function Settings() {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Companies */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Moje firmy
-              </CardTitle>
-              <CardDescription>
-                Firmy pre fakturáciu zákaziek
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  Moje firmy
+                </CardTitle>
+                <CardDescription>
+                  Firmy pre fakturáciu zákaziek
+                </CardDescription>
+              </div>
+              <Button size="sm" onClick={() => setAddingCompany(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Pridať firmu
+              </Button>
             </CardHeader>
             <CardContent>
               <Table>
@@ -226,11 +233,19 @@ export default function Settings() {
         {/* User Management */}
         <UserManagement />
 
-        {/* Company Edit Dialog */}
+        {/* Company Edit Dialog — edit existing */}
         <CompanyEditDialog
           company={editingCompany}
           open={!!editingCompany}
           onOpenChange={(open) => !open && setEditingCompany(null)}
+        />
+
+        {/* Company Add Dialog — create new */}
+        <CompanyEditDialog
+          company={null}
+          open={addingCompany}
+          onOpenChange={setAddingCompany}
+          onSuccess={() => setAddingCompany(false)}
         />
       </div>
     </MainLayout>
