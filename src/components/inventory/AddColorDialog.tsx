@@ -8,24 +8,22 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Search, Palette } from 'lucide-react';
-import { STRUCTURE_TYPE_LABELS, GLOSS_TYPE_LABELS } from '@/lib/types';
-import type { StructureType, GlossType } from '@/lib/types';
+import { Plus, Search } from 'lucide-react';
 import { RAL_COLORS, findRALColor } from '@/lib/ral-colors';
 import { cn } from '@/lib/utils';
+import { useStructuresGlosses } from '@/hooks/useStructuresGlosses';
 
 interface AddColorDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const STRUCTURE_OPTIONS: StructureType[] = ['hladka', 'jemna', 'hruba', 'antik', 'kladivkova'];
-const GLOSS_OPTIONS: GlossType[] = ['leskle', 'polomatne', 'matne', 'satenovane', 'hlboko_matne', 'metalicke', 'fluorescentne', 'glitrove', 'perletove'];
-
 export function AddColorDialog({ open, onOpenChange }: AddColorDialogProps) {
   const queryClient = useQueryClient();
-  const [structure, setStructure] = useState<StructureType>('hladka');
-  const [gloss, setGloss] = useState<GlossType>('matne');
+  const { structures, glosses } = useStructuresGlosses();
+
+  const [structure, setStructure] = useState('hladka');
+  const [gloss, setGloss] = useState('matne');
   const [ralCode, setRalCode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [stockKg, setStockKg] = useState('0');
@@ -44,6 +42,9 @@ export function AddColorDialog({ open, onOpenChange }: AddColorDialogProps) {
     );
   }, [searchQuery]);
 
+  const structureLabel = structures.find(s => s.value === structure)?.label ?? structure;
+  const glossLabel = glosses.find(g => g.value === gloss)?.label ?? gloss;
+
   const createColorMutation = useMutation({
     mutationFn: async () => {
       if (!ralCode) throw new Error('Vyberte RAL kód');
@@ -52,8 +53,8 @@ export function AddColorDialog({ open, onOpenChange }: AddColorDialogProps) {
         .from('colors')
         .insert({
           ral_code: ralCode,
-          structure,
-          gloss,
+          structure: structure as any,
+          gloss: gloss as any,
           hex_code: selectedRalInfo?.hex || '#808080',
           color_name: selectedRalInfo?.name || null,
           stock_kg: parseFloat(stockKg) || 0,
@@ -70,7 +71,7 @@ export function AddColorDialog({ open, onOpenChange }: AddColorDialogProps) {
     },
     onSuccess: () => {
       toast.success('Farba pridaná', {
-        description: `RAL ${ralCode} - ${STRUCTURE_TYPE_LABELS[structure]} / ${GLOSS_TYPE_LABELS[gloss]}`,
+        description: `RAL ${ralCode} - ${structureLabel} / ${glossLabel}`,
       });
       queryClient.invalidateQueries({ queryKey: ['colors'] });
       resetForm();
@@ -84,8 +85,8 @@ export function AddColorDialog({ open, onOpenChange }: AddColorDialogProps) {
   });
 
   const resetForm = () => {
-    setStructure('hladka');
-    setGloss('matne');
+    setStructure(structures[0]?.value ?? 'hladka');
+    setGloss(glosses[0]?.value ?? 'matne');
     setRalCode('');
     setSearchQuery('');
     setStockKg('0');
@@ -121,14 +122,14 @@ export function AddColorDialog({ open, onOpenChange }: AddColorDialogProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Štruktúra povrchu</Label>
-              <Select value={structure} onValueChange={(v) => setStructure(v as StructureType)}>
+              <Select value={structure} onValueChange={setStructure}>
                 <SelectTrigger className="min-h-[48px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {STRUCTURE_OPTIONS.map((s) => (
-                    <SelectItem key={s} value={s} className="min-h-[44px]">
-                      {STRUCTURE_TYPE_LABELS[s]}
+                  {structures.map((s) => (
+                    <SelectItem key={s.value} value={s.value} className="min-h-[44px]">
+                      {s.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -136,14 +137,14 @@ export function AddColorDialog({ open, onOpenChange }: AddColorDialogProps) {
             </div>
             <div className="space-y-2">
               <Label>Stupeň lesku</Label>
-              <Select value={gloss} onValueChange={(v) => setGloss(v as GlossType)}>
+              <Select value={gloss} onValueChange={setGloss}>
                 <SelectTrigger className="min-h-[48px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {GLOSS_OPTIONS.map((g) => (
-                    <SelectItem key={g} value={g} className="min-h-[44px]">
-                      {GLOSS_TYPE_LABELS[g]}
+                  {glosses.map((g) => (
+                    <SelectItem key={g.value} value={g.value} className="min-h-[44px]">
+                      {g.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
